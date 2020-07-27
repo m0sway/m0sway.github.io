@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://m0sway.github.io</id>
     <title>m0sway</title>
-    <updated>2020-07-27T08:17:36.789Z</updated>
+    <updated>2020-07-27T08:22:24.284Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://m0sway.github.io"/>
     <link rel="self" href="https://m0sway.github.io/atom.xml"/>
-    <subtitle>每道伤口的背后.有多少的回忆痛到窒息.</subtitle>
+    <subtitle>m0sway&apos;s blog.</subtitle>
     <logo>https://m0sway.github.io/images/avatar.png</logo>
     <icon>https://m0sway.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, m0sway</rights>
