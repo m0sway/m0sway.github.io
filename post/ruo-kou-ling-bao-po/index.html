@@ -164,53 +164,195 @@
 </script>
             <div class="main">
                 <div class="container">
-                    <div class="post-wrap archive">
-                        
+                    <article class="post-wrap">
+                        <header class="post-header">
+                            <h1 class="post-title">
+                                弱口令爆破
+                            </h1>
                             
-                                <h3>
-                                    2020
-                                </h3>
+                                    <!--zh-->
+                                    <div class="post-meta zh">
+                                        &#x4F5C;&#x8005;:
+                                        <a itemprop="author" rel="author" href="/">
+                                            m0sway
+                                        </a>
+                                        <span class="post-time">&#x65E5;&#x671F;: <a href="#">2020-10-06</a></span>
+                                        <span class="post-readtime">&#x9605;&#x8BFB;&#x65F6;&#x95F4;:<a
+                                    href="#">3.5
+                                    &#x5206;&#x949F;</a></span>
+                                        <span class="post-words">&#x5B57;&#x6570;:<a href="#">995</a></span>
+                                        
+                                            <span class="post-category">&#x5206;&#x7C7B;:
+                                
+                                <a href="https://m0sway.github.io/tag/ooDNTGI2j/">信息收集</a>
+                                
+                                <a href="https://m0sway.github.io/tag/kX-lRZXOs/">m0sway</a>
+                                
+                            </span>
+                                            
+                                                阅读量:
+                                                <span data-hk-page="current"> - </span>
+                                                
+                                    </div>
+                                    
+                        </header>
+                        
+                        <div class="post-content">
+                            <h3 id="1-用户名确定方法">1. 用户名确定方法</h3>
+<p>因为一些网站登陆框，输入不存在的用户名，会提示：用户名不存在，请重新输入 (这种情况下其实就可以提一个用户名枚举的漏洞)。<br>
+我们根据该信息可以枚举用户名，如果枚举的用户名很多的话，就可以用这些用户名，批量去撞弱口令,可以大大提高爆破成功率。</p>
+<h4 id="11-用户名枚举漏洞">1.1 用户名枚举漏洞</h4>
+<p>用户名枚举主要就是利用，输入存在用户名和不存在用户名时返回信息不同来确认。而用户名枚举，因为不是爆破同一个账号的密码，所以不容易引起系统，waf拦截还是很好用的。<br>
+而登陆页面中可以输入用户名的地方有三处：登陆框，密码找回，注册</p>
+<h4 id="某src注册接口">某src注册接口：</h4>
+<p>注册接口，手机号存在会提示：用户名已存在。<br>
+用户不存在，会提示：验证码以发送。<br>
+虽然发送同一ip发起发送验证码请求过多会提示：验证码请求频繁，但是当手机号存在时依旧会提示：用户名已存在。<br>
+从而造成注册手机号枚举。</p>
+<h4 id="12-利用公开信息收集用户名">1.2 利用公开信息收集用户名</h4>
+<p>搜索引擎收集：<br>
+比如，收集高校学号信息</p>
+<pre><code>site:*.test.edu.cn 学号
+</code></pre>
+<p>就能收集到很多，更进一步收集还有收集泄露的office文件，一般excel文件中比较多</p>
+<pre><code>site:*.test.edu.cn filetype:xlsx 学号
+site:*.test.edu.cn filetype:docx
+</code></pre>
+<p>企业公开信息：<br>
+最近p神在小密圈分享了一个找用户名的小技巧：</p>
+<pre><code>爆破弱口令的时候经常需要目标公司的员工姓名组成字典，但员工姓名字典从哪来呢？
+
+大型公司（员工数量5k+），可以根据中国姓名拼音Top500来做。但是对于千人及以下的中小型创业公司就不是很灵了。
+
+分享一种方法，适用于所有公司（尤其是科技公司），就是爬一下这个公司的专利信息列表。由于专利信息都是公开的，能找到大量人员真实姓名，而且多半是技术人员。
+
+企查查和天眼查都可以做这个事情。
+</code></pre>
+<p>社交软件：<br>
+比如我们可以搜索qq群：</p>
+<pre><code>2020级清华大学通知群
+某公司xx项目开发群
+...
+</code></pre>
+<p>编造一下加群信息，进入群的瞬间打开文件，下载所有群文件....也许有意想不到的收获.</p>
+<h3 id="2-密码生成">2. 密码生成</h3>
+<p>密码生成主要使用一些小工具</p>
+<h4 id="21-pydictor">2.1 <strong>pydictor</strong></h4>
+<p>项目地址：https://github.com/LandGrey/pydictor<br>
+该工具有很多模块，其中社会工程学字典模块，可以根据用户信息针对性生成字典：<br>
+<code>python pydictor.py --sedb</code><br>
+设置收集到的用户名，邮箱，生日等可以针对性的生成字典。<br>
+该工具还有字典合并去重，字典编码等多种功能，也可以单独 编写扩展插件。</p>
+<h4 id="22-杂七杂八的小工具">2.2 杂七杂八的小工具</h4>
+<p>在线字典生成网站：<br>
+https://www.bugku.com/mima/</p>
+<h4 id="23-一些小尝试">2.3 一些小尝试</h4>
+<p>常用手段出不来，可以试试：<br>
+域名，用户名，企业名，后台名称加1-5位随机数字。<br>
+如：htgl8899，zhangsan2020<br>
+六位数字太费时间就不优先考虑了</p>
+<h3 id="3存在验证码">3.存在验证码</h3>
+<p>存在验证码，验证码过弱，或者存在绕过缺陷也是可以被爆破的</p>
+<h4 id="31-验证码识别">3.1 验证码识别</h4>
+<p><strong>pkavhttpfuzzer</strong><br>
+验证码识别可以使用pkavhttpfuzzer，该工具可以识别一些特别简单的验证码<br>
+也可以使用burp插件：https://github.com/c0ny1/captcha-killer<br>
+调用第三方的打码平台接口<br>
+比如这里调用：http://www.ttshitu.com/ 的识别接口，识别效果还是不错的。不过太贵了，一般渗透测试，不至于不至于...</p>
+
+                        </div>
+                        
                                 
                                     
+                                            <!--zh-->
+                                            <section class="post-copyright zh">
+                                                <p class="copyright-item ">
+                                                    <span>&#x4F5C;&#x8005;:</span>
+                                                    <span>m0sway</span>
+                                                </p>
 
-                                        <article class="archive-item">
-                                            <a class="archive-item-link" href="https://m0sway.github.io/post/ruo-kou-ling-bao-po/">
-                                                弱口令爆破
-                                            </a>
-                                            <span class="archive-item-date">2020-10-06 </span>
-                                        </article>
-                                        
-                                            
-                                    
+                                                <p class="copyright-item">
+                                                    <span>&#x6C38;&#x4E45;&#x94FE;&#x63A5;:</span>
+                                                    <span><a href="https://m0sway.github.io/post/ruo-kou-ling-bao-po/">https://m0sway.github.io/post/ruo-kou-ling-bao-po/</a></span>
+                                                </p>
 
-                                        <article class="archive-item">
-                                            <a class="archive-item-link" href="https://m0sway.github.io/post/windows-xi-tong-xin-xi-shou-ji/">
-                                                Windows 系统信息收集
-                                            </a>
-                                            <span class="archive-item-date">2020-09-03 </span>
-                                        </article>
-                                        
-                                            
-                                    
-
-                                        <article class="archive-item">
-                                            <a class="archive-item-link" href="https://m0sway.github.io/post/xin-xi-shou-ji-zong-jie-pian-bu-ding-qi-geng-xin/">
-                                                信息收集系统篇
-                                            </a>
-                                            <span class="archive-item-date">2020-07-18 </span>
-                                        </article>
-                                        
+                                                <p class="copyright-item">
+                                                    <span>&#x534F;&#x8BAE;:</span>
+                                                    <span>MIT License</span>
+                                                </p>
+                                            </section>
                                             
                                                 
-                    </div>
-                    <div class="pagination-container">
+                                                    
+                                                                    <!--Share-->
+                                                                    <span style="margin-right:15px">
+                        <i class="post-share"></i>
+                        <span>&#x5206;&#x4EAB;:</span>
+                                                                    <a title="QR 码" target="_blank" href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://m0sway.github.io/post/ruo-kou-ling-bao-po/"><i class="fa fa-qrcode"></i></a>
+                                                                    <a title="QQ" target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://m0sway.github.io/post/ruo-kou-ling-bao-po/&sharesource=qzone&title=弱口令爆破&pics=https://m0sway.github.io/images/avatar.png?v=1602039077860&summary="><i class="fa fa-qq"></i></a>
+                                                                    <a title="新浪微博" target="_blank" href="https://service.weibo.com/share/share.php?url=https://m0sway.github.io/post/ruo-kou-ling-bao-po/&sharesource=weibo&title=弱口令爆破 + " - " + &pic="https://m0sway.github.io/images/avatar.png?v=1602039077860 "><i class="fa fa-weibo "></i></a>
+
+                                                                    </span>
+                                                                    
+                                                                            <!--zh-->
+                                                                            <section class="post-tags zh ">
+                                                                                <div>
+                                                                                    <span>&#x6807;&#x7B7E;:</span>
+                                                                                    <span class="tag ">
+                        
+                        
+                        <a href="https://m0sway.github.io/tag/ooDNTGI2j/">#
+                    信息收集
+                        </a>
+                        
+                        <a href="https://m0sway.github.io/tag/kX-lRZXOs/">#
+                    m0sway
+                        </a>
                         
                             
-                                    
-                                            
-                    </div>
+                                </span>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <a href="javascript:window.history.back();">
+                        &#x8FD4;&#x56DE;</a>
+                                                                                    <span>&dot;</span>
+                                                                                    <a href="#">&#x4E3B;&#x9875;</a>
+                                                                                </div>
+                                                                            </section>
+
+                                                                            
+                                                                                <!---->
+                                                                                <section class="post-nav">
+                                                                                    
+                                                                                            
+                                                                                                <a class="next" rel="next" href="https://m0sway.github.io/post/windows-xi-tong-xin-xi-shou-ji/">
+                                                                                                    Windows 系统信息收集
+                                                                                                </a>
+                                                                                                
+                                                                                </section>
+                    </article>
                 </div>
+                
+                                            
+                                                <script type="application/javascript" src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+<div id="vlaine-comment"></div>
+<script type="application/javascript">
+    new Valine({
+        el: '#vlaine-comment',
+        appId: 'uW9floiITitWlppTUG210Vco-gzGzoHsz',
+        appKey: 'QOQ63bDmWvNAx6F04cpXfCW0',
+        pageSize: 10,
+        avatar: 'mp',
+        placeholder: '嘿嘿嘿！！！',
+        visitor: true,
+        highlight: true,
+        recordIP: true,
+    })
+</script>
+                                                    
             </div>
+    </div>
+    </div>
     </div>
     
     <div id="player"></div>
@@ -341,5 +483,8 @@
                     
         </div>
 </body>
+<script>
+    scroll();
+</script>
 
 </html>
