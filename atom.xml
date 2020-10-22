@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://m0sway.github.io</id>
     <title>m0sway</title>
-    <updated>2020-10-07T02:51:23.625Z</updated>
+    <updated>2020-10-22T08:22:15.912Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://m0sway.github.io"/>
     <link rel="self" href="https://m0sway.github.io/atom.xml"/>
@@ -10,6 +10,131 @@
     <logo>https://m0sway.github.io/images/avatar.png</logo>
     <icon>https://m0sway.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, m0sway</rights>
+    <entry>
+        <title type="html"><![CDATA[未授权访问漏洞总结]]></title>
+        <id>https://m0sway.github.io/post/wei-shou-quan-fang-wen-lou-dong-zong-jie/</id>
+        <link href="https://m0sway.github.io/post/wei-shou-quan-fang-wen-lou-dong-zong-jie/">
+        </link>
+        <updated>2020-10-22T06:40:19.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="0x01-redis未授权访问">0x01 Redis未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+py工具写入ssh直接连接<br>
+<strong>解决方法</strong><br>
+方法一： 可以修改绑定的IP、端口和指定访问者IP。<br>
+默认情况下，Redis 监听 127.0.0.1。如果仅仅是本地通信，请确保监听在本地，这种方式可以在一定程度上缓解 Redis 未授权访问的风险（例外情况下，如果 Redis 以 root 用户运行，攻击者借助已有的 webshell，就可以利用该 Redis 来反弹 shell 以实现提权）。<br>
+只有本机才能访问 Redis：<br>
+在 redis.conf 文件中找到 # bind 127.0.0.1，将前面的 # 去掉，然后保存。<br>
+注意：该操作需要重启 Redis 才能生效。<br>
+指定访问源 IP 来访问 Redis：<br>
+<code>bind 192.168.1.100 10.0.0.1</code><br>
+注意：该操作需要重启 Redis 才能生效。<br>
+方法二： 设置访问密码<br>
+在redis.conf 中找到 requirepass 字段，去掉其注释，并在后面填上需要的密码。Redis 客户端也需要使用此密码来访问 Redis 服务。<br>
+打开 <code>/etc/redis/redis.conf</code>配置文件:<br>
+<code>requirepass !QE%^E3323BDWEwwwe1839</code><br>
+方法三： 设置防火墙策略<br>
+如果正常业务中 Redis 服务需要被其他服务器来访问，可以通过 iptables 策略，仅允许指定的 IP 来访问 Redis 服务。<br>
+<code>iptables -A INPUT -s x.x.x.x -p tcp --dport 6379 -j ACCEPT</code><br>
+注意：x.x.x.x  修改为实际IP或者网段</p>
+<h3 id="0x02-mongodb未授权访问">0x02 Mongodb未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+安装mongodb，然后连接到服务。<br>
+<code>mongo --host 10.2.20.34 --port 27017</code><br>
+<strong>解决方法</strong><br>
+方法一：可以修改端口和指定访问ip，也可以使用防火墙来配置访问策略。<br>
+配置AUTH，做好访问认证。打开MongoDB配置文件（.conf），设置为auth=true；<br>
+修改访问端口和指定访问ip。使其只监听私有IP（或本地IP），不监听任何公网IP或DNS。<br>
+使用--bind_ip选项，该选项可以限制监听接口IP为特定的内网IP， 当在启动mongodb的时候<br>
+使用 --bind_ip 10.0.0.1表示启动ip地址绑定，数据库实例将只监听10.0.0.1内网的请求。<br>
+mongod --bind_ip 10.0.0.1<br>
+方法二：<br>
+在admin.system.users中添加用户，启动认证。<br>
+#在admin 数据库中创建用户userbb， 密码为xy2020<br>
+方法三： 设置防火墙策略<br>
+如果正常业务中 MongoDB 服务需要被其他服务器来访问，可以通过 iptables 策略，仅允许指定的 IP 来访问服务。<br>
+iptables -A INPUT -s x.x.x.x -p tcp --dport 27017 -j ACCEPT<br>
+注意：x.x.x.x  修改为实际IP或者网段</p>
+<h3 id="0x03-memcached未授权访问">0x03 Memcached未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+<code>telnet &lt;target&gt; 11211</code> 或 <code>nc -vv &lt;target&gt; 11211</code><br>
+使用了 stats 命令来输出 Memcached 服务信息等。<br>
+<strong>解决方法</strong><br>
+方法一： 可以修改绑定的IP、端口和指定访问者IP。<br>
+Memcached没有在公网开放的必要，可在Memcached启动时指定绑定的IP地址为 127.0.0.1。例如，在Linux环境中运行以下命令：<br>
+<code>memcached -d -m 1024 -u memcached -l 127.0.0.1 -p 11211 -c 1024 -P /tmp/memcached.pid</code><br>
+方法二： 增加Memcached的认证配置。<br>
+```<br>
+Memcached从1.4.3版本开始，支持SASL认证。</p>
+<pre><code>    安装启动SASL服务，新增用户xy2020,密码也为XY2020
+
+    # /etc/init.d/saslauthd start
+
+    # /usr/sbin/testsaslauthd -u xy2020 -p XY2020
+
+    # ./memcached -d -m 1024 -S -l 192.168.128.83 -p 11212 -u tuxedo
+    ```
+</code></pre>
+<h3 id="0x04-zookeeper-未授权访问">0x04 ZooKeeper 未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+安装ZooKeeper，然后连接到服务。</p>
+<pre><code>        wget https://mirrors.bfsu.edu.cn/apache/zookeeper/zookeeper-3.6.2/apache-zookeeper-3.6.2-bin.tar.gz
+        tar -xzvf  apache-zookeeper-3.6.2-bin.tar.gz
+        cd apache-zookeeper-3.6.2-bin/bin
+        ./zkCli.sh  -timeout 0 -r -server  10.10.10.10:2181
+        备注：windows 下为：zkCli.cmd  -timeout 0 -r -server  10.10.4.72:2181
+</code></pre>
+<p><strong>解决方法</strong></p>
+<h3 id="0x05-zookeeper-未授权访问">0x05 ZooKeeper 未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+直接访问：<br>
+<code>curl http://10.10.10.10:9200 curl http://10.10.10.10:9200/_cat</code><br>
+<strong>解决方法</strong></p>
+<h3 id="0x06-kibana-未授权访问">0x06 Kibana 未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+直接访问<br>
+<strong>解决方法</strong></p>
+<h3 id="0x07-docker-未授权访问">0x07 Docker 未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+```<br>
+直接使用浏览器访问：<br>
+http://10.10.10.10:2375/version<br>
+http://10.10.10.10:2375/info</p>
+<pre><code>        或者
+
+    用docker进行操作(建议)：
+        docker  -H tcp://10.10.10.10:2375 images
+        //也就是直接连接进实例，然后进行提权操作
+    ```
+</code></pre>
+<p><strong>解决方法</strong></p>
+<h3 id="0x08-hadoop-未授权访问">0x08 Hadoop 未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+直接访问：<br>
+<code>http://10.10.10.10:8088/cluster</code><br>
+<strong>解决方法</strong></p>
+<h3 id="0x09-jenkins-未授权访问">0x09 Jenkins 未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+直接访问：<br>
+<code>http://10.10.10.10:8088/cluster</code><br>
+<code>RCE执行方式：↓</code><br>
+<code>println &quot;whoami&quot;.execute().text</code></p>
+<p><strong>解决方法</strong></p>
+<h3 id="0x10-springboot-actuator-未授权访问">0x10 Springboot actuator 未授权访问</h3>
+<p><strong>漏洞利用：</strong></p>
+<p><strong>解决方法</strong></p>
+<h3 id="0x11-ftp-未授权访问">0x11 FTP 未授权访问</h3>
+<p><strong>漏洞利用：</strong><br>
+用FTP直接登录：<br>
+帐号/密码：anonymouse/anonymouse<br>
+<strong>解决方法</strong></p>
+<h3 id="0x12-hadoop-未授权访问">0x12 Hadoop 未授权访问</h3>
+<p><strong>漏洞利用：</strong></p>
+<pre><code>        rsync rsync://{target_ip}/  #访问
+        rsync rsync://{target_ip}/etc/passwd ./     #任意文件下载
+</code></pre>
+<p><strong>解决方法</strong></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[弱口令爆破]]></title>
         <id>https://m0sway.github.io/post/ruo-kou-ling-bao-po/</id>
