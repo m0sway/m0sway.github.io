@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="m0sway">
+
+
+
+
+
+<title>Windows 系统信息收集 | m0sway&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">m0sway&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">m0sway&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Windows 系统信息收集</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">m0sway</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">九月 3, 2020&nbsp;&nbsp;15:21:23</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/">信息收集</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="一、本机信息"><a href="#一、本机信息" class="headerlink" title="一、本机信息"></a>一、本机信息</h1><h3 id="1、系统程序"><a href="#1、系统程序" class="headerlink" title="1、系统程序"></a>1、系统程序</h3><p>收集系统信息，包括操作系统版本，已安装补丁列表等。通常使用以下方法收集：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net config workstation/server                                 # 查询简易系统信息</span><br><span class="line">systeminfo                                                    # 查询全部内容</span><br><span class="line">wmic qfe get Caption,Description,HotFixID,InstalledOn         # 查询已安装的补丁列表</span><br></pre></td></tr></table></figure>
+
+<p>注：其中systeminfo命令查询内容最全，但如果系统更新的补丁较多，可能会导致反应反应时间过长；使用 webshell 执行此命令可能会因为超时导致无法正常回显，或回显内容长度过长，无法全部显示。</p>
+<h3 id="2、进程服务"><a href="#2、进程服务" class="headerlink" title="2、进程服务"></a>2、进程服务</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tasklist /v                              # 查询正在运行的进程</span><br><span class="line">wmic product get name,version            # 查询所有安装过的软件及版本</span><br><span class="line">powershell &quot;Get-WmiObject -class Win32_Product |Select-Object -Property name,version&quot;</span><br><span class="line"># 使用 powershell 查询所有安装过的软件及版本，效果和 wmic 相同</span><br><span class="line">wmic service list brief                  # 查询当前机器的服务信息</span><br><span class="line">wmic startup get command,caption         # 查看启动项</span><br><span class="line">schtasks  /query  /fo  LIST /v           # 查看任务计划</span><br></pre></td></tr></table></figure>
+
+<p>windows 自带防火墙及特殊过滤规则等网络访问均可使用<code>netsh</code>及相关命令查看。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">netsh firewall show config                      # 查看防火墙信息，但 firewall 命令已弃用，可使用 advfirewall 命令代替</span><br><span class="line">netsh advfirewall firewall show rule name=all   # 查看配置规则</span><br><span class="line">netsh advfirewall set allprofiles state off\on  # 关闭防火墙\开启防火墙</span><br><span class="line">netsh advfirewall export\import xx.pol          # 导出\导入配置文件</span><br><span class="line">netsh advfirewall firewall add rule name=”deny tcp 139″ dir=in protocol=tcp localport=139 action=block         # 新建规则阻止TCP协议139端口</span><br><span class="line">netsh advfirewall firewall add rule name=&quot;Remote Desktop&quot; protocol=TCP dir=in localport=3389 action=allow              # 新建规则允许3389通过防火墙</span><br><span class="line">netsh advfirewall firewall delete rule name=Remote Desktop  # 删除名为Remote Desktop的规则</span><br><span class="line">netsh interface                                 # 连接安全规则配置，很少配置。</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、用户信息"><a href="#3、用户信息" class="headerlink" title="3、用户信息"></a>3、用户信息</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">whoami                                   # 当前用户</span><br><span class="line">quser                                    # 查询登录用户，同 query user</span><br><span class="line">qwinsta                                  # 查询登录用户，同 query user</span><br><span class="line">query user                               # 查询登录用户</span><br><span class="line">query session                            # 查询会话</span><br><span class="line">query termserver                         # 查询远程桌面主机列表。</span><br><span class="line">net accounts                             # 查询域密码策略</span><br><span class="line">net user                                 # 查询本地用户列表</span><br><span class="line">net user &quot;$username&quot;                     # 查询指定用户</span><br><span class="line">net localgroup                           # 查询本地用户组列表</span><br><span class="line">net localgroup &quot;$groupname&quot;              # 查询指定用户组成员</span><br><span class="line">net group                                # 仅域控可执行，查询用户组列表</span><br><span class="line">net group &quot;$groupname&quot;                   # 仅域控可执行，查询用户组成员</span><br></pre></td></tr></table></figure>
+
+<p>注：quser、qwinsta和query命令只存在于允许安装 RDP 服务的主机上，官方描述其仅存在于 server 2012 及以上版本存在。其中query termserver命令存在问题，本地测试时与描述严重不符，无法列出信息。</p>
+<h3 id="4、操作记录"><a href="#4、操作记录" class="headerlink" title="4、操作记录"></a>4、操作记录</h3><p>cmd 和 powershell v3 以下的操作记录无法长时间保存，仅限当前窗口。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Get-History | Format-List -Property *         # 查询 powershell 当前窗口历史操作记录</span><br><span class="line">Clear-History                                 # 删除 powershell 当前窗口历史操作记录</span><br><span class="line">Clear-History -Id 3                           # 删除 powershell 当前窗口指定 ID 的历史操作记录</span><br><span class="line">doskey /h                                     # 查看 cmd 的历史操作记录</span><br><span class="line">doskey /reinstall                             # 删除 cmd 的历史操作记录</span><br></pre></td></tr></table></figure>
+
+<p>可以通过向进程发送键盘内容的方式将运行中的窗口历史操作记录导出。</p>
+<p>powershell v5 以上的操作历史记录会直接保存在指定文件中。直接查看即可。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">可以通过向进程发送键盘内容的方式将运行中的窗口历史操作记录导出。</span><br><span class="line"></span><br><span class="line">powershell v5 以上的操作历史记录会直接保存在指定文件中。直接查看即可。</span><br></pre></td></tr></table></figure>
+
+<p>powershell v3、v4 版本需要安装<code>Get-PSReadlineOption</code>。<br><code>msiexec /q /i PackageManagement_x64.msi</code></p>
+<h1 id="二、网络发现"><a href="#二、网络发现" class="headerlink" title="二、网络发现"></a>二、网络发现</h1><p>内网网络发现是一个很重要的信息收集内容，一般情况下是不建议使用扫描器扫描，尤其不建议使用 nmap，当然，如果是靶场，或是甲方授权就另当别论。</p>
+<h3 id="1、基本信息收集"><a href="#1、基本信息收集" class="headerlink" title="1、基本信息收集"></a>1、基本信息收集</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ipconfig /all                     # 列出当前主机详细网络信息</span><br><span class="line">ipconfig  /displaydns             # 列出dns缓存信息</span><br><span class="line">route print                       # 查询路由表</span><br><span class="line">arp -a                            # 地址解析协议缓存表</span><br><span class="line">netstat -ano                      # 端口使用情况</span><br><span class="line">net share                         # 查看共享信息</span><br><span class="line">net view                          # 查看共享资源列表</span><br><span class="line">wmic share get name,path,status   # 查看共享信息</span><br><span class="line"># 查看 host 文件</span><br><span class="line">type  c:\Windows\system32\drivers\etc\hosts</span><br></pre></td></tr></table></figure>
+
+<p>使用 arp 命令收集最近建立过连接的 ip，但是此方法在某些时候无法收集到网段外的 ip 地址。</p>
+<h3 id="2、SPN-信息收集"><a href="#2、SPN-信息收集" class="headerlink" title="2、SPN 信息收集"></a>2、SPN 信息收集</h3><p>SPN：服务主体名称。使用 Kerberos 须为服务器注册 SPN，因此可以在内网中扫描 SPN，快速寻找内网中注册的服务，SPN 扫描可以规避像端口扫描的不确定性探测动作。</p>
+<p>主要利用工具有：setspn、GetUserSPNs.vbs和Rubeus。</p>
+<p>利用 Windows 自带的 setspn 工具</p>
+<p>普通域用户权限执行即可</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setspn -T domain.com -Q /</span><br></pre></td></tr></table></figure>
+
+<p>利用 GetUserSPNs.vbs</p>
+<p>使用 Rubeus 工具</p>
+<h3 id="3、协议探测"><a href="#3、协议探测" class="headerlink" title="3、协议探测"></a>3、协议探测</h3><h4 id="icmp-协议"><a href="#icmp-协议" class="headerlink" title="icmp 协议"></a>icmp 协议</h4><p>直接回显</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for /l %i in (1,1,255) do @ ping 10.0.0.%i -w 1 -n 1|find /i &quot;ttl=&quot;</span><br></pre></td></tr></table></figure>
+
+<p>输出文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@for /l %i in (1,1,255) do @ping -n 1 -w 40 192.168.0.%i &amp; if errorlevel 1 (echo 192.168.0.%i &gt;&gt; ip.txt) else (echo 192.168.0.%i &gt;&gt; ip.txt)</span><br></pre></td></tr></table></figure>
+
+<h4 id="Netbios-协议"><a href="#Netbios-协议" class="headerlink" title="Netbios 协议"></a>Netbios 协议</h4><p>msf 扫描</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; use auxiliary/scanner/netbios/nbname</span><br></pre></td></tr></table></figure>
+
+<p>nbtscan 扫描，下载：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.unixwiz.net/tools/nbtscan.html#download</span><br></pre></td></tr></table></figure>
+
+<p>参数：<code>-m 192.168.1.0/24</code></p>
+<h4 id="UDP-协议"><a href="#UDP-协议" class="headerlink" title="UDP 协议"></a>UDP 协议</h4><p>msf</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; use auxiliary/scanner/discovery/udp_probemsf &gt; use auxiliary/scanner/discovery/udp_sweep</span><br></pre></td></tr></table></figure>
+
+<h4 id="smb-version"><a href="#smb-version" class="headerlink" title="smb-version"></a>smb-version</h4><p>python版：<code>https://github.com/amitn322/smb-version</code><br>c#版：<code>https://www.zcgonvh.com/post/CSharp_smb_version_Detection.html</code></p>
+<h4 id="SNMP-协议"><a href="#SNMP-协议" class="headerlink" title="SNMP 协议"></a>SNMP 协议</h4><p>msf</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; use auxiliary/scanner/snmp/snmp_enum</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、系统日志"><a href="#4、系统日志" class="headerlink" title="4、系统日志"></a>4、系统日志</h3><p>可以使用<code>wevtutil.exe psloglist.exe</code>或者 powershell 的<code>Get-WinEvent</code>模块进行日志导出，server 03 的域控可使用 eventquery.vbs 导出。</p>
+<p>wevtutil 不需要 UAC， 支持很多过滤语法，若有需要请查看官方说明。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 查询登录日志语法</span><br><span class="line">wevtutil qe security /f:text /q:*[System[(EventID=4624)]]</span><br><span class="line"># 查询所有登录、注销相关的日志语法</span><br><span class="line">wevtutil qe security /rd:true /f:text /q:&quot;*[system/eventid=4624 and 4623 and 4627]&quot;</span><br><span class="line"># 远程查询时在后面加入/r:computer /u:user /p:password 比如查询dc1上的登录注销日志</span><br><span class="line">wevtutil qe security /rd:true /f:text /q:&quot;*[system/eventid=4624 and 4623 and 4672]&quot; /r:dc1 /u:administrator /p:password</span><br></pre></td></tr></table></figure>
+
+<p>本地使用 LogParser 日志分析工具整理导出的日志，然后去除重复数据、无效数据（以 ‘$’ 结束的用户名）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LogParser.exe -i:EVT -o txt &quot;SELECT TO_UPPERCASE(EXTRACT_TOKEN(Strings,5,&#x27;|&#x27;)) as USERNAME,TO_UPPERCASE(EXTRACT_TOKEN(Strings,18,&#x27;|&#x27;)) as SOURCE_IP FROM C:\ProgramData\log.evtx&quot; &gt; C:\ProgramData\log.txt</span><br></pre></td></tr></table></figure>
+
+<p>导出域控登录日志到域控上:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wevtutil epl Security C:\ProgramData\dc.evtx /q:&quot;*[EventData[Data[@Name=&#x27;LogonType&#x27;]=&#x27;3&#x27;] and System[(EventID=4624) and TimeCreated[timediff(@SystemTime) &lt;= 2592000000]]]&quot; /r:域控IP /u:域管 /p:域管密码</span><br></pre></td></tr></table></figure>
+
+<h3 id="5、浏览器日志"><a href="#5、浏览器日志" class="headerlink" title="5、浏览器日志"></a>5、浏览器日志</h3><p>收集浏览器访问记录。</p>
+<p>chrome</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users$username\AppData\Local\Google\Chrome\User Data\Default\History</span><br></pre></td></tr></table></figure>
+
+<p>firefox</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users$username\AppData\Roaming\Mozilla\Firefox\Profiles$name.default\places.sqlite</span><br></pre></td></tr></table></figure>
+
+<p>IE</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query &quot;HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\TypedURLs&quot; 或C:\Users$user\AppData\Local\Microsoft\Windows\History</span><br></pre></td></tr></table></figure>
+
+<p>edge, v79+:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users$user\AppData\Local\Microsoft\Edge\User Data\Default\History</span><br></pre></td></tr></table></figure>
+
+<p>v44+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users$user\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat</span><br></pre></td></tr></table></figure>
+
+<h3 id="6、DNS-服务器记录"><a href="#6、DNS-服务器记录" class="headerlink" title="6、DNS 服务器记录"></a>6、DNS 服务器记录</h3><p>如果目标机器在域内，只需要按部就班收集域信息，准备域横向渗透即可。</p>
+<p>但其中有一点单独提一下，一般在域环境中都会有一台 DNS 服务器，小企业或内网环境较小的可能会和域控为同一台，大一些的企业，多为独立的 DNS 服务器。</p>
+<p>由于 DNS 服务器的特性，因此，在 DNS 服务器上会存在大量内网地址解析记录，如果可以获取，会极大的方便内网拓扑展开，同时很多其他主机无法到达的地址，DNS 服务器是可以到达的。</p>
+<p>列出 DNS 区域中当前节点的资源记录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dnscmd . /EnumZones</span><br></pre></td></tr></table></figure>
+
+<p>列出 test.com 的信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dnscmd . /ZoneInfo test.com</span><br></pre></td></tr></table></figure>
+
+<p>列出 test.com 中的详细记录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dnscmd . /ZonePrint test.com</span><br></pre></td></tr></table></figure>
+
+<p>列出 test.com 中的记录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dnscmd . /EnumRecords test.com</span><br></pre></td></tr></table></figure>
+
+<p>DNS 记录有正向解析和反向解析两种。</p>
+<p>正向解析是从域名到IP，反向解析则是从 IP 到域名。</p>
+<p>反向隔离和正向隔离相同，都会有一个对应的区域，因此，查询方式与正向记录相同。</p>
+<p>DNS 服务器还存在域传送漏洞。可以直接获得 DNS 记录。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nslookup -type=all_ldap._tcp.dc.greyfinger.com</span><br><span class="line"></span><br><span class="line">nslookup -type=ns domain.com</span><br><span class="line"></span><br><span class="line">cmd&gt; nslookup server dns.domain.com ls domain.com</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、域信息查询"><a href="#三、域信息查询" class="headerlink" title="三、域信息查询"></a>三、域信息查询</h1><h3 id="1、基本信息收集-1"><a href="#1、基本信息收集-1" class="headerlink" title="1、基本信息收集"></a>1、基本信息收集</h3><p>域信息收集，需要当前用户为域用户。本地用户无法执行域命令查询域内容。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">net config workstation                    # 查询当前登录域</span><br><span class="line">net time                                  # 同步时间，通常为域控服务器</span><br><span class="line">net accounts /domain                      # 查询域密码策略</span><br><span class="line">net user /domain                          # 列出当前域成员列表</span><br><span class="line">net user username /domain                 # 列出域成员详细信息</span><br><span class="line">net group /domain                         # 列出域内组列表</span><br><span class="line">net group groupname /domain               # 列出域内组成员列表</span><br><span class="line">net view                                  # 查询同一域内机器列表</span><br><span class="line">net view /domain                          # 查询域列表</span><br><span class="line">net view /domain:test                     # 查询 test 域中计算机列表</span><br><span class="line">nltest /dclist:domain                     # 查询域内的所有DC</span><br><span class="line">nltest /dsgetdc:domain                    # 拿到DC当前的认证信息</span><br><span class="line">nltest /domain_trusts                     # 查询域信任信息</span><br><span class="line">nltest /user:&quot;username&quot;                   # 得到用户信息</span><br></pre></td></tr></table></figure>
+
+<p>想要定位域管和域控机器，可以查询<code>domain admin</code>和<code>domain controllers</code>组，需要注意的是，组名会随系统语言变化而变化，如<code>domain controllers</code>会变化成<code>domaine contrôleurs</code>。</p>
+<p>在域内其他机器上，查询组是<code>net group /domain</code>，而在域控上则是<code>net group</code>。</p>
+<h3 id="2、dsquery"><a href="#2、dsquery" class="headerlink" title="2、dsquery"></a>2、dsquery</h3><p>dsquery 命令很少使用，而且限制较大仅能在域控上执行，所以相对而言较为鸡肋，但是在一定条件下还是具有一定的使用价值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dsquery computer                          # 查询目录中的计算机</span><br><span class="line">dsquery contact                           # 查询目录中的联系人</span><br><span class="line">dsquery subnet                            # 查询目录中的子网</span><br><span class="line">dsquery group                             # 查询目录中的组</span><br><span class="line">dsquery site                              # 查询目录中的站点</span><br><span class="line">dsquery user                              # 查询目录中的用户</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、powershell"><a href="#3、powershell" class="headerlink" title="3、powershell"></a>3、powershell</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 查询当前Domain信息</span><br><span class="line">[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()</span><br><span class="line"># 查询域信任关系</span><br><span class="line">([System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()).GetAllTrustRelationships()</span><br><span class="line"># 查询当前林信息</span><br><span class="line">[System.DirectoryServices.ActiveDirectory.Forest]::GetCurrentForest()</span><br><span class="line"># 查询林信任信息</span><br><span class="line">([System.DirectoryServices.ActiveDirectory.Forest]::GetForest((New-Object System.DirectoryServices.ActiveDirectory.DirectoryContext(&#x27;Forest&#x27;, &#x27;forest-of-interest.local&#x27;)))).GetAllTrustRelationships()</span><br></pre></td></tr></table></figure>
+
+<h1 id="四、配置文件收集"><a href="#四、配置文件收集" class="headerlink" title="四、配置文件收集"></a>四、配置文件收集</h1><h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p>IIS 配置文件路径为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%windir%\system32\inetsrv\config\applicationHost.config</span><br></pre></td></tr></table></figure>
+
+<p>使用 appcmd 的方式可以快速导出所需内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%windir%\system32\inetsrv\appcmd list site /config %windir%\system32\inetsrv\appcmd list site /config /xml &gt; c:\sites.xml</span><br></pre></td></tr></table></figure>
+
+<h3 id="密码保存"><a href="#密码保存" class="headerlink" title="密码保存"></a>密码保存</h3><h4 id="navicat"><a href="#navicat" class="headerlink" title="navicat"></a>navicat</h4><table>
+<thead>
+<tr>
+<th>数据库</th>
+<th align="left">路径</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MySQL</td>
+<td align="left">HKEYCURRENTUSER\Software\PremiumSoft\Navicat\Servers\</td>
+</tr>
+<tr>
+<td>MariaDB</td>
+<td align="left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatMARIADB\Servers\</td>
+</tr>
+<tr>
+<td>MongoDB</td>
+<td align="left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatMONGODB\Servers\</td>
+</tr>
+<tr>
+<td>Microsoft SQL</td>
+<td align="left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatMSSQL\Servers\</td>
+</tr>
+<tr>
+<td>Oracle</td>
+<td align="left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatOra\Servers\</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td align="left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatPG\Servers\</td>
+</tr>
+<tr>
+<td>SQLite</td>
+<td align="left">HKEYCURRENTUSER\Software\PremiumSoft\NavicatSQLite\Servers\</td>
+</tr>
+</tbody></table>
+<h4 id="navicat-1"><a href="#navicat-1" class="headerlink" title="navicat"></a>navicat</h4><table>
+<thead>
+<tr>
+<th>系统版本</th>
+<th align="left">路径</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>xp&#x2F;win2003</td>
+<td align="left">C:\Documents and Settings\USERNAME\Application Data\VanDyke\Config\Sessions</td>
+</tr>
+<tr>
+<td>win7&#x2F;win2008以上</td>
+<td align="left">C:\Users\USERNAME\AppData\Roaming\VanDyke\Config\Sessions</td>
+</tr>
+</tbody></table>
+<h4 id="Xshell"><a href="#Xshell" class="headerlink" title="Xshell"></a>Xshell</h4><table>
+<thead>
+<tr>
+<th>版本</th>
+<th align="left">路径</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Xshell 5</td>
+<td align="left">%userprofile%\Documents\NetSarang\Xshell\Sessions</td>
+</tr>
+<tr>
+<td>Xshell 6</td>
+<td align="left">%userprofile%\Documents\NetSarang Computer\6\Xshell\Sessions</td>
+</tr>
+</tbody></table>
+<h4 id="WinSCP"><a href="#WinSCP" class="headerlink" title="WinSCP"></a>WinSCP</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HKCU\Software\Martin Prikryl\WinSCP 2\Sessions</span><br></pre></td></tr></table></figure>
+
+<h4 id="VNC"><a href="#VNC" class="headerlink" title="VNC:"></a>VNC:</h4><table>
+<thead>
+<tr>
+<th>版本</th>
+<th align="left">路径</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RealVNC</td>
+<td align="left">HKEYLOCALMACHINE\SOFTWARE\RealVNC\vncserver</td>
+<td>Password</td>
+</tr>
+<tr>
+<td>TightVNC</td>
+<td align="left">HKEYCURRENTUSER\Software\TightVNC\Server Value</td>
+<td>Password or PasswordViewOnly</td>
+</tr>
+<tr>
+<td>TigerVNC</td>
+<td align="left">HKEYLOCALUSER\Software\TigerVNC\WinVNC4</td>
+<td>Password</td>
+</tr>
+<tr>
+<td>UltraVNC</td>
+<td align="left">C:\Program Files\UltraVNC\ultravnc.ini</td>
+<td>passwd or passwd2</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>m0sway</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2020/09/03/Windows%20%E7%B3%BB%E7%BB%9F%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/">http://example.com/2020/09/03/Windows%20%E7%B3%BB%E7%BB%9F%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/"># 信息收集</a>
+                    
+                        <a href="/tags/Windows/"># Windows</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/10/06/%E5%BC%B1%E5%8F%A3%E4%BB%A4%E7%88%86%E7%A0%B4/">弱口令爆破</a>
+            
+            
+            <a class="next" rel="next" href="/2020/07/31/%E5%8F%8D%E5%BC%B9shell%E6%80%BB%E7%BB%93/">反弹shell总结</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© m0sway
+    </div>
+    
+        <!-- 统计 -->
+        <span id="busuanzi_container_site_pv">
+                访问量: <span id="busuanzi_value_site_pv"></span>
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                访客: <span id="busuanzi_value_site_uv"></span>
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</footer>
+
+    </div>
+</body>
+
+</html>

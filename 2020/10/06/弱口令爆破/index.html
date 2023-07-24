@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="m0sway">
+
+
+
+
+
+<title>弱口令爆破 | m0sway&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">m0sway&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">m0sway&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">弱口令爆破</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">m0sway</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">十月 6, 2020&nbsp;&nbsp;17:43:40</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%B8%97%E9%80%8F%E6%8A%80%E5%B7%A7/">渗透技巧</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="1-用户名确定方法"><a href="#1-用户名确定方法" class="headerlink" title="1. 用户名确定方法"></a>1. 用户名确定方法</h3><p>因为一些网站登陆框，输入不存在的用户名，会提示：用户名不存在，请重新输入 (这种情况下其实就可以提一个用户名枚举的漏洞)。<br>我们根据该信息可以枚举用户名，如果枚举的用户名很多的话，就可以用这些用户名，批量去撞弱口令,可以大大提高爆破成功率。</p>
+<h4 id="1-1-用户名枚举漏洞"><a href="#1-1-用户名枚举漏洞" class="headerlink" title="1.1 用户名枚举漏洞"></a>1.1 用户名枚举漏洞</h4><p>用户名枚举主要就是利用，输入存在用户名和不存在用户名时返回信息不同来确认。而用户名枚举，因为不是爆破同一个账号的密码，所以不容易引起系统，waf拦截还是很好用的。<br>而登陆页面中可以输入用户名的地方有三处：登陆框，密码找回，注册</p>
+<h4 id="某src注册接口："><a href="#某src注册接口：" class="headerlink" title="某src注册接口："></a>某src注册接口：</h4><p>注册接口，手机号存在会提示：用户名已存在。<br>用户不存在，会提示：验证码以发送。<br>虽然发送同一ip发起发送验证码请求过多会提示：验证码请求频繁，但是当手机号存在时依旧会提示：用户名已存在。<br>从而造成注册手机号枚举。</p>
+<h4 id="1-2-利用公开信息收集用户名"><a href="#1-2-利用公开信息收集用户名" class="headerlink" title="1.2 利用公开信息收集用户名"></a>1.2 利用公开信息收集用户名</h4><p>搜索引擎收集：<br>比如，收集高校学号信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">site:*.test.edu.cn 学号</span><br></pre></td></tr></table></figure>
+
+<p>就能收集到很多，更进一步收集还有收集泄露的office文件，一般excel文件中比较多</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">site:*.test.edu.cn filetype:xlsx 学号</span><br><span class="line">site:*.test.edu.cn filetype:docx</span><br></pre></td></tr></table></figure>
+
+<p>企业公开信息：<br>最近p神在小密圈分享了一个找用户名的小技巧：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">爆破弱口令的时候经常需要目标公司的员工姓名组成字典，但员工姓名字典从哪来呢？</span><br><span class="line"></span><br><span class="line">大型公司（员工数量5k+），可以根据中国姓名拼音Top500来做。但是对于千人及以下的中小型创业公司就不是很灵了。</span><br><span class="line"></span><br><span class="line">分享一种方法，适用于所有公司（尤其是科技公司），就是爬一下这个公司的专利信息列表。由于专利信息都是公开的，能找到大量人员真实姓名，而且多半是技术人员。</span><br><span class="line"></span><br><span class="line">企查查和天眼查都可以做这个事情。</span><br></pre></td></tr></table></figure>
+
+<p>社交软件：<br>比如我们可以搜索qq群：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2020级清华大学通知群</span><br><span class="line">某公司xx项目开发群</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>编造一下加群信息，进入群的瞬间打开文件，下载所有群文件….也许有意想不到的收获.</p>
+<h3 id="2-密码生成"><a href="#2-密码生成" class="headerlink" title="2. 密码生成"></a>2. 密码生成</h3><p>密码生成主要使用一些小工具</p>
+<h4 id="2-1-pydictor"><a href="#2-1-pydictor" class="headerlink" title="2.1 pydictor"></a>2.1 <strong>pydictor</strong></h4><p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/LandGrey/pydictor">https://github.com/LandGrey/pydictor</a><br>该工具有很多模块，其中社会工程学字典模块，可以根据用户信息针对性生成字典：<br><code>python pydictor.py --sedb</code><br>设置收集到的用户名，邮箱，生日等可以针对性的生成字典。<br>该工具还有字典合并去重，字典编码等多种功能，也可以单独 编写扩展插件。</p>
+<h4 id="2-2-杂七杂八的小工具"><a href="#2-2-杂七杂八的小工具" class="headerlink" title="2.2 杂七杂八的小工具"></a>2.2 杂七杂八的小工具</h4><p>在线字典生成网站：<br><a target="_blank" rel="noopener" href="https://www.bugku.com/mima/">https://www.bugku.com/mima/</a></p>
+<h4 id="2-3-一些小尝试"><a href="#2-3-一些小尝试" class="headerlink" title="2.3 一些小尝试"></a>2.3 一些小尝试</h4><p>常用手段出不来，可以试试：<br>域名，用户名，企业名，后台名称加1-5位随机数字。<br>如：htgl8899，zhangsan2020<br>六位数字太费时间就不优先考虑了</p>
+<h3 id="3-存在验证码"><a href="#3-存在验证码" class="headerlink" title="3.存在验证码"></a>3.存在验证码</h3><p>存在验证码，验证码过弱，或者存在绕过缺陷也是可以被爆破的</p>
+<h4 id="3-1-验证码识别"><a href="#3-1-验证码识别" class="headerlink" title="3.1 验证码识别"></a>3.1 验证码识别</h4><p><strong>pkavhttpfuzzer</strong><br>验证码识别可以使用pkavhttpfuzzer，该工具可以识别一些特别简单的验证码<br>也可以使用burp插件：<a target="_blank" rel="noopener" href="https://github.com/c0ny1/captcha-killer">https://github.com/c0ny1/captcha-killer</a><br>调用第三方的打码平台接口<br>比如这里调用：<a target="_blank" rel="noopener" href="http://www.ttshitu.com/">http://www.ttshitu.com/</a> 的识别接口，识别效果还是不错的。不过太贵了，一般渗透测试，不至于不至于…</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>m0sway</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2020/10/06/%E5%BC%B1%E5%8F%A3%E4%BB%A4%E7%88%86%E7%A0%B4/">http://example.com/2020/10/06/%E5%BC%B1%E5%8F%A3%E4%BB%A4%E7%88%86%E7%A0%B4/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/10/22/%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/">未授权访问漏洞总结</a>
+            
+            
+            <a class="next" rel="next" href="/2020/09/03/Windows%20%E7%B3%BB%E7%BB%9F%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/">Windows 系统信息收集</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© m0sway
+    </div>
+    
+        <!-- 统计 -->
+        <span id="busuanzi_container_site_pv">
+                访问量: <span id="busuanzi_value_site_pv"></span>
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                访客: <span id="busuanzi_value_site_uv"></span>
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</footer>
+
+    </div>
+</body>
+
+</html>

