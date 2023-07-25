@@ -911,19 +911,19 @@
 </tr>
 <tr>
 <td>启用sp_send_dbmail并发送查询</td>
-<td>sp_configure ‘show advanced options’, 1;RECONFIGURE;sp_configure ‘Database Mail XPs’, 1;RECONFIGURE;exec msdb..sp_send_dbmail @recipients&#x3D;‘<a href="mailto:&#x68;&#x61;&#x72;&#x6f;&#108;&#x64;&#64;&#x6e;&#101;&#x74;&#115;&#x70;&#105;&#46;&#99;&#x6f;&#x6d;">&#x68;&#x61;&#x72;&#x6f;&#108;&#x64;&#64;&#x6e;&#101;&#x74;&#115;&#x70;&#105;&#46;&#99;&#x6f;&#x6d;</a>‘,@query&#x3D;’select @@version’;</td>
+<td>sp_configure ‘show advanced options’, 1;RECONFIGURE;sp_configure ‘Database Mail XPs’, 1;RECONFIGURE;exec msdb..sp_send_dbmail @recipients&#x3D;‘<a href="mailto:&#x68;&#x61;&#114;&#x6f;&#108;&#100;&#64;&#110;&#x65;&#116;&#115;&#112;&#x69;&#x2e;&#99;&#x6f;&#109;">&#x68;&#x61;&#114;&#x6f;&#108;&#100;&#64;&#110;&#x65;&#116;&#115;&#112;&#x69;&#x2e;&#99;&#x6f;&#109;</a>‘,@query&#x3D;’select @@version’;</td>
 </tr>
 <tr>
 <td>基本的xp_sendmail查询</td>
-<td>EXEC master..xp_sendmail ‘<a href="mailto:&#104;&#x61;&#x72;&#x6f;&#108;&#100;&#64;&#110;&#101;&#116;&#x73;&#x70;&#x69;&#46;&#99;&#x6f;&#x6d;">&#104;&#x61;&#x72;&#x6f;&#108;&#100;&#64;&#110;&#101;&#116;&#x73;&#x70;&#x69;&#46;&#99;&#x6f;&#x6d;</a>‘, ‘This is a test.’</td>
+<td>EXEC master..xp_sendmail ‘<a href="mailto:&#x68;&#97;&#114;&#111;&#x6c;&#x64;&#64;&#x6e;&#x65;&#x74;&#115;&#x70;&#x69;&#46;&#x63;&#111;&#x6d;">&#x68;&#97;&#114;&#111;&#x6c;&#x64;&#64;&#x6e;&#x65;&#x74;&#115;&#x70;&#x69;&#46;&#x63;&#111;&#x6d;</a>‘, ‘This is a test.’</td>
 </tr>
 <tr>
 <td>使用xp_sendmail发送完整的电子邮件</td>
-<td>EXEC xp_sendmail @recipients&#x3D;‘<a href="mailto:&#x68;&#x61;&#x72;&#111;&#108;&#100;&#x40;&#110;&#101;&#116;&#115;&#112;&#x69;&#46;&#99;&#111;&#x6d;">&#x68;&#x61;&#x72;&#111;&#108;&#100;&#x40;&#110;&#101;&#116;&#115;&#112;&#x69;&#46;&#99;&#111;&#x6d;</a>‘, @message&#x3D;’This is a test.’, @copy_recipients&#x3D;‘<a href="mailto:&#116;&#101;&#x73;&#x74;&#x40;&#x6e;&#101;&#x74;&#x73;&#112;&#105;&#x2e;&#x63;&#x6f;&#109;">&#116;&#101;&#x73;&#x74;&#x40;&#x6e;&#101;&#x74;&#x73;&#112;&#105;&#x2e;&#x63;&#x6f;&#109;</a>‘, @subject&#x3D;’TEST’</td>
+<td>EXEC xp_sendmail @recipients&#x3D;‘<a href="mailto:&#x68;&#97;&#114;&#x6f;&#x6c;&#100;&#64;&#110;&#x65;&#x74;&#x73;&#112;&#105;&#46;&#x63;&#x6f;&#x6d;">&#x68;&#97;&#114;&#x6f;&#x6c;&#100;&#64;&#110;&#x65;&#x74;&#x73;&#112;&#105;&#46;&#x63;&#x6f;&#x6d;</a>‘, @message&#x3D;’This is a test.’, @copy_recipients&#x3D;‘<a href="mailto:&#x74;&#101;&#x73;&#x74;&#x40;&#110;&#x65;&#116;&#115;&#112;&#105;&#46;&#99;&#x6f;&#x6d;">&#x74;&#101;&#x73;&#x74;&#x40;&#110;&#x65;&#116;&#115;&#112;&#105;&#46;&#99;&#x6f;&#x6d;</a>‘, @subject&#x3D;’TEST’</td>
 </tr>
 <tr>
 <td>通过xp_sendmail发送查询结果</td>
-<td>EXEC xp_sendmail ‘<a href="mailto:&#104;&#97;&#114;&#111;&#x6c;&#x64;&#64;&#x6e;&#101;&#116;&#115;&#112;&#x69;&#46;&#99;&#111;&#x6d;">&#104;&#97;&#114;&#111;&#x6c;&#x64;&#64;&#x6e;&#101;&#116;&#115;&#112;&#x69;&#46;&#99;&#111;&#x6d;</a>‘, @query&#x3D;’SELECT @@version’;</td>
+<td>EXEC xp_sendmail ‘<a href="mailto:&#x68;&#x61;&#114;&#111;&#x6c;&#100;&#64;&#110;&#101;&#x74;&#115;&#x70;&#x69;&#x2e;&#x63;&#111;&#x6d;">&#x68;&#x61;&#114;&#111;&#x6c;&#100;&#64;&#110;&#101;&#x74;&#115;&#x70;&#x69;&#x2e;&#x63;&#111;&#x6d;</a>‘, @query&#x3D;’SELECT @@version’;</td>
 </tr>
 <tr>
 <td>通过xp_sendmail发送查询结果作为附件</td>
@@ -964,7 +964,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2022/02/18/Mssql%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/">http://example.com/2022/02/18/Mssql%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/</a></span>
+                        <span><a href="http://m0sway.top/2022/02/18/Mssql%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/">http://m0sway.top/2022/02/18/Mssql%E6%B3%A8%E5%85%A5%E5%A4%87%E5%BF%98%E5%BD%95/</a></span>
                     </p>
                 
                 
